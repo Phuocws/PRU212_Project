@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 75ac4e1c6d640954b8f7012cd22aa208
+guid: b8797db0313944f4f9a06e28e1b9b442
 TextureImporter:
   internalIDToNameTable:
   - first:
@@ -272,13 +272,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      U_Walk_0: -4009086310334153817
-      U_Walk_1: -2648376872383064187
-      U_Walk_2: -764003165941485920
-      U_Walk_3: 6818739885194633778
-      U_Walk_4: -5951623572059180443
-      U_Walk_5: -8036710771169646379
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -1,0 +1,1 @@
+public enum ArcherAction { Idle = 0, PreAttack = 1, Attack = 2 }

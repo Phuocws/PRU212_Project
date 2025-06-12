@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: f31a99d0cebfbe446ba631cac9b013d6
+guid: 5f328df0252a886468bb5b8e077a6520
 TextureImporter:
   internalIDToNameTable:
   - first:
@@ -66,7 +66,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 25
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -131,10 +131,10 @@ TextureImporter:
       name: D_Walk_0
       rect:
         serializedVersion: 2
-        x: 15
-        y: 9
-        width: 18
-        height: 15
+        x: 16
+        y: 10
+        width: 16
+        height: 13
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -153,10 +153,10 @@ TextureImporter:
       name: D_Walk_1
       rect:
         serializedVersion: 2
-        x: 62
-        y: 9
-        width: 20
-        height: 14
+        x: 63
+        y: 10
+        width: 18
+        height: 12
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -175,10 +175,10 @@ TextureImporter:
       name: D_Walk_2
       rect:
         serializedVersion: 2
-        x: 112
-        y: 13
-        width: 16
-        height: 17
+        x: 113
+        y: 14
+        width: 14
+        height: 15
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -197,10 +197,10 @@ TextureImporter:
       name: D_Walk_3
       rect:
         serializedVersion: 2
-        x: 160
-        y: 17
-        width: 16
-        height: 18
+        x: 161
+        y: 18
+        width: 14
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -219,10 +219,10 @@ TextureImporter:
       name: D_Walk_4
       rect:
         serializedVersion: 2
-        x: 208
-        y: 16
-        width: 16
-        height: 18
+        x: 209
+        y: 17
+        width: 14
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -241,10 +241,10 @@ TextureImporter:
       name: D_Walk_5
       rect:
         serializedVersion: 2
-        x: 256
-        y: 12
-        width: 16
-        height: 16
+        x: 257
+        y: 13
+        width: 14
+        height: 14
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -263,7 +263,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 87ec19642014c26459fb11dbcb56f95c
     internalID: 0
     vertices: []
     indices: 
@@ -271,7 +271,9 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":48.0,"y":48.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
       D_Walk_0: 6808733625049879353
       D_Walk_1: 2958005836100429432

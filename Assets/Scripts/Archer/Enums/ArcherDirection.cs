@@ -1,0 +1,1 @@
+public enum ArcherDirection { Down = 0, Up = 1, Side = 2 }
