@@ -1,10 +1,8 @@
-using UnityEngine;
-
 public class Orc : BaseEnemy
 {
 	protected override void Awake()
 	{
-		maxHealth = 100f;
+		maxHealth = 10000f;
 		base.Awake();
 	}
 	
@@ -12,6 +10,5 @@ public class Orc : BaseEnemy
 	{
 		base.Update();
 		// Additional Orc-specific update logic can go here
-		base.TakeDamage(Time.deltaTime * 5f); // Example of health decay over time
 	}
 }

@@ -4,12 +4,12 @@ public class PathEndTrigger : MonoBehaviour
 {
 	private void OnTriggerEnter2D(Collider2D other)
 	{
-		if (other.CompareTag("Orc") || other.CompareTag("Wolf"))
+		// Optional: check if the object has BaseEnemy (more flexible than tag check)
+		if (other.TryGetComponent(out BaseEnemy enemy))
 		{
-			Debug.Log("Enemy reached the end!");
-
-			// Later: Deal damage to base here
-			Destroy(other.gameObject);
+			enemy.gameObject.SetActive(false); // Return to pool
+			// Optionally: apply damage to player base here
+			// GameManager.Instance.TakeDamage(enemy.DamageValue); 
 		}
 	}
 }

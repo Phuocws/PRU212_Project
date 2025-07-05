@@ -6,11 +6,14 @@ TagManager:
   tags:
   - Orc
   - Wolf
+  - Arrow
+  - Slime
+  - Bee
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Enemy
   - Water
   - UI
   - 
@@ -48,6 +51,21 @@ TagManager:
     locked: 0
   - name: ForeGround
     uniqueID: 976959051
+    locked: 0
+  - name: Enermies
+    uniqueID: 1448736733
+    locked: 0
+  - name: Tower
+    uniqueID: 1321628451
+    locked: 0
+  - name: Archer
+    uniqueID: 1069729061
+    locked: 0
+  - name: Hp
+    uniqueID: 2672389385
+    locked: 0
+  - name: Arrow
+    uniqueID: 4092407107
     locked: 0
   m_RenderingLayers:
   - Default

@@ -1,10 +1,8 @@
-using UnityEngine;
-
 public class Wolf : BaseEnemy
 {
 	protected override void Awake()
 	{
-		maxHealth = 150f;
+		maxHealth = 50f;
 		base.Awake();
 	}
 
@@ -12,6 +10,5 @@ public class Wolf : BaseEnemy
 	{
 		base.Update();
 		// Additional Wolf-specific update logic can go here
-		base.TakeDamage(Time.deltaTime * 10f); // Example of health decay over time
 	}
 }

@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8334b0985b36e194f8a359cd85fbb085, type: 3}
+  m_Name: Tower1
+  m_EditorClassIdentifier: 
+  towerVisualPrefab: {fileID: 9131571476301610310, guid: d784e8d4bce59ad4ea5d50c24d264133, type: 3}
+  archerCount: 1
+  range: 10
+  archerTier: {fileID: 11400000, guid: 4f09376d9c6c5f54897c3fe957f72e01, type: 2}
+  arrowTier: {fileID: 11400000, guid: 278a7081e251ef34d84ab774da2fb645, type: 2}

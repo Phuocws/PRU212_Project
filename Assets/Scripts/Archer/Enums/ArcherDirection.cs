@@ -1,1 +1,6 @@
-public enum ArcherDirection { Down = 0, Up = 1, Side = 2 }
+public enum ArcherDirection
+{
+	Down = 0,
+	Up = 26,
+	Side = 76
+}

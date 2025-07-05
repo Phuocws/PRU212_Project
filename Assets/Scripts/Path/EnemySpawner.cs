@@ -2,13 +2,6 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-	[System.Serializable]
-	public class EnemyWave
-	{
-		public GameObject enemyPrefab;
-		public int count;
-		public float spawnInterval;
-	}
 
 	[SerializeField] private EnemyWave[] waves;
 	[SerializeField] private Transform spawnPoint;
@@ -20,6 +13,43 @@ public class EnemySpawner : MonoBehaviour
 	private float waveDelayTimer = 0f;
 	private bool spawning = false;
 	private bool waitingForNextWave = false;
+
+	[System.Serializable]
+	public class EnemyWave
+	{
+		public string enemyTag; // Match with Pool tag
+		public int count;
+		public float spawnInterval;
+	}
+
+	private void SpawnEnemy()
+	{
+		Vector3 spawnPos = spawnPoint.position;
+		float laneOffset = Random.Range(-0.3f, 0.5f);
+		Vector2 pathOffset = new Vector2(0f, laneOffset);
+
+		GameObject enemyObj = ObjectPool.Instance.SpawnFromPool(
+			waves[currentWaveIndex].enemyTag,
+			spawnPos,
+			Quaternion.identity
+		);
+
+		if (enemyObj != null)
+		{
+			BaseEnemy enemy = enemyObj.GetComponent<BaseEnemy>();
+			enemy.ResetEnemy(); // Create this method to reset health, animation state, etc.
+
+			EnemyMovement movement = enemyObj.GetComponent<EnemyMovement>();
+			if (movement != null)
+			{
+				movement.SetPathOffset(pathOffset);
+				movement.SetSnapToFirstWaypoint(true);
+				movement.InitializePosition(); // force it after setting position
+			}
+
+			enemiesSpawned++;
+		}
+	}
 
 	void Start()
 	{
@@ -74,31 +104,8 @@ public class EnemySpawner : MonoBehaviour
 		}
 		else
 		{
-			Debug.Log("All waves completed!");
+			//Debug.Log("All waves completed!");
 			// Trigger win condition here
 		}
-	}
-
-	private void SpawnEnemy()
-	{
-		Vector3 spawnPos = spawnPoint.position;
-
-		// Generate lane-style offset (horizontal or vertical)
-		float laneOffset = Random.Range(-0.3f, 0.5f); // You can adjust this range
-		Vector2 pathOffset = new Vector2(0f, laneOffset); // vertical lanes
-
-		GameObject enemyObj = Instantiate(
-			waves[currentWaveIndex].enemyPrefab,
-			spawnPos,
-			Quaternion.identity
-		);
-
-		EnemyMovement movement = enemyObj.GetComponent<EnemyMovement>();
-		if (movement != null)
-		{
-			movement.SetPathOffset(pathOffset);
-		}
-
-		enemiesSpawned++;
 	}
 }

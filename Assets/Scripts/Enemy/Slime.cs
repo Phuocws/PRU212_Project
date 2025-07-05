@@ -1,0 +1,114 @@
+using UnityEngine;
+
+public class Slime : BaseEnemy
+{
+	[Header("Slime Settings")]
+	public SlimeType slimeType;
+
+	[SerializeField] private float specialSlimeSpawnChance = 0.3f;
+	[SerializeField] private string specialSlimeTag = "SpecialSlime";
+	[SerializeField] private string cloneSlimeTag = "CloneSlime";
+
+	private Vector2 splitDirection;
+	private int splitWaypointIndex;
+	private bool hasSplit = false;
+
+	protected override void Awake()
+	{
+		maxHealth = slimeType == SlimeType.Clone ? 30f : 50f;
+		base.Awake();
+
+		if (slimeType == SlimeType.Special)
+			GetComponent<EnemyMovement>().enabled = false;
+	}
+
+	public override void TakeDamage(float amount)
+	{
+		if (slimeType == SlimeType.Special)
+			return;
+
+		base.TakeDamage(amount);
+	}
+
+	protected override void Die()
+	{
+		if (slimeType != SlimeType.Normal)
+		{
+			base.Die();
+			return;
+		}
+
+		if (Random.value < specialSlimeSpawnChance)
+		{
+			Vector3 spawnPos = transform.position;
+			Vector2 direction = moveDirection;
+
+			int pathIndex = 0;
+			if (TryGetComponent<EnemyMovement>(out var currentMovement))
+				pathIndex = currentMovement.GetCurrentWaypointIndex();
+
+			gameObject.SetActive(false);
+
+			GameObject special = ObjectPool.Instance.SpawnFromPool(specialSlimeTag, spawnPos, Quaternion.identity);
+			if (special != null && special.TryGetComponent<Slime>(out var specialSlime))
+			{
+				special.SetActive(true);
+				specialSlime.slimeType = SlimeType.Special;
+				specialSlime.StartSplit(direction, pathIndex);
+			}
+		}
+		else
+		{
+			base.Die();
+		}
+	}
+
+	public void StartSplit(Vector2 inheritedDirection, int pathIndex)
+	{
+		moveDirection = inheritedDirection;
+		splitWaypointIndex = pathIndex;
+		hasSplit = false;
+
+		animator.SetFloat("MoveX", moveDirection.x);
+		animator.SetFloat("MoveY", moveDirection.y);
+		animator.SetTrigger("Split");
+
+		DisableColliders();
+	}
+
+	// Animation event should call this at the END of the Split animation
+	public void OnSplitAnimationComplete()
+	{
+		if (hasSplit) return;
+		hasSplit = true;
+
+		SpawnClone(transform.position + new Vector3(-0.3f, 0), -0.15f);
+		SpawnClone(transform.position + new Vector3(0.3f, 0), 0.15f);
+
+		gameObject.SetActive(false); // Disable AFTER clone spawn
+	}
+
+	private void SpawnClone(Vector3 pos, float yOffset)
+	{
+		GameObject clone = ObjectPool.Instance.SpawnFromPool(cloneSlimeTag, pos, Quaternion.identity);
+		if (clone != null && clone.TryGetComponent<Slime>(out var slime))
+		{
+			slime.slimeType = SlimeType.Clone;
+			slime.ResetEnemy();
+
+			if (clone.TryGetComponent<EnemyMovement>(out var movement))
+			{
+				movement.SetSnapToFirstWaypoint(false);
+				movement.SetPathOffset(new Vector2(0f, yOffset), false);
+				movement.InitializePosition(); // Keeps current position
+				movement.SetWaypointIndex(splitWaypointIndex);
+			}
+		}
+	}
+
+	public override void ResetEnemy()
+	{
+		base.ResetEnemy();
+		GetComponent<EnemyMovement>().enabled = (slimeType != SlimeType.Special);
+	}
+}

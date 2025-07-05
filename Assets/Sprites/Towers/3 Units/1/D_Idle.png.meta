@@ -18,7 +18,7 @@ TextureImporter:
   serializedVersion: 13
   mipmaps:
     mipMapMode: 0
-    enableMipMap: 0
+    enableMipMap: 1
     sRGBTexture: 1
     linearTexture: 0
     fadeOut: 0
@@ -46,7 +46,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -60,7 +60,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 32
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -125,19 +125,19 @@ TextureImporter:
       name: D_Idle_0
       rect:
         serializedVersion: 2
-        x: 13
-        y: 14
-        width: 21
-        height: 29
+        x: 0
+        y: 0
+        width: 48
+        height: 48
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 1000c67fa41c58720800000000000000
+      spriteID: 647fa139b73f7d14ca3aacf92d3a9fc9
       internalID: 2847894867104497665
       vertices: []
       indices: 
@@ -147,19 +147,19 @@ TextureImporter:
       name: D_Idle_1
       rect:
         serializedVersion: 2
-        x: 62
-        y: 14
-        width: 19
-        height: 30
+        x: 48
+        y: 0
+        width: 48
+        height: 48
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 00d341b02080fc160800000000000000
+      spriteID: 336a18f442171db49aef26ff3c11bee1
       internalID: 7047860746726948096
       vertices: []
       indices: 
@@ -169,19 +169,19 @@ TextureImporter:
       name: D_Idle_2
       rect:
         serializedVersion: 2
-        x: 109
-        y: 14
-        width: 21
-        height: 30
+        x: 96
+        y: 0
+        width: 48
+        height: 48
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 8c19c63e87a5661b0800000000000000
+      spriteID: 7434b01dabe381440ac201b50037cfb0
       internalID: -5663740006113701432
       vertices: []
       indices: 
@@ -191,19 +191,19 @@ TextureImporter:
       name: D_Idle_3
       rect:
         serializedVersion: 2
-        x: 156
-        y: 14
-        width: 23
-        height: 29
+        x: 144
+        y: 0
+        width: 48
+        height: 48
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 01073f2ab485ed560800000000000000
+      spriteID: deeaa0084a7c2ed47b3a71e5ccafea01
       internalID: 7340401524540141584
       vertices: []
       indices: 
@@ -213,7 +213,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: ab4959589412f044889f6f7e1782bb35
     internalID: 0
     vertices: []
     indices: 
@@ -221,7 +221,9 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":48.0,"y":48.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
       D_Idle_0: 2847894867104497665
       D_Idle_1: 7047860746726948096
