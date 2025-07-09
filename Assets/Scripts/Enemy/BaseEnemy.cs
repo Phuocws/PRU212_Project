@@ -6,7 +6,10 @@ public abstract class BaseEnemy : MonoBehaviour
 {
 	[Header("Common Settings")]
 	[SerializeField] protected float maxHealth = 50f;
-	[SerializeField] protected Image healthBar;
+	[SerializeField] protected Image healthValue;
+	[SerializeField] protected GameObject healthBar; // Health bar UI element
+	[SerializeField] public int damageAtEndOfPath = 1; // Damage to player base when enemy reaches the end
+	[SerializeField] public int coinValue = 10; // Score awarded for defeating this enemy
 
 	public float currentHealth;
 	protected Animator animator;
@@ -19,6 +22,8 @@ public abstract class BaseEnemy : MonoBehaviour
 	[SerializeField] protected CapsuleCollider2D frontCollider;
 	[SerializeField] protected CapsuleCollider2D backCollider;
 	[SerializeField] protected CapsuleCollider2D sideCollider;
+
+	private bool isDead = false;
 
 	public float SpawnTime { get; private set; }
 
@@ -101,12 +106,16 @@ public abstract class BaseEnemy : MonoBehaviour
 		currentHealth = Mathf.Clamp(currentHealth - amount, 0, maxHealth);
 		UpdateHealthBar();
 
-		if (currentHealth <= 0)
+		if (currentHealth <= 0 && !isDead)
+		{
 			Die();
+		}
 	}
 
 	protected virtual void Die()
 	{
+		if (isDead) return; 
+
 		Vector2 dir = lastValidMoveDirection;
 
 		animator.SetFloat("MoveX", dir.x);
@@ -116,11 +125,17 @@ public abstract class BaseEnemy : MonoBehaviour
 			spriteRenderer.flipX = dir.x > 0;
 
 		animator.SetTrigger("Die");
+		isDead = true;
+		EnemyTracker.Instance.UnregisterEnemy();
 
 		DisableColliders();
+		healthBar.SetActive(false);
 		GetComponent<EnemyMovement>().enabled = false;
 
-		StartCoroutine(DeactivateAfterDelay());
+		if (gameObject.activeInHierarchy)
+			StartCoroutine(DeactivateAfterDelay());
+
+		GameManager.Instance.AddCoins(coinValue);
 	}
 
 	private IEnumerator DeactivateAfterDelay()
@@ -132,17 +147,18 @@ public abstract class BaseEnemy : MonoBehaviour
 	public virtual void ResetEnemy()
 	{
 		gameObject.SetActive(true);
+		isDead = false;
 		currentHealth = maxHealth;
 		UpdateHealthBar();
 		EnableColliders();
-
+		healthBar.SetActive(true);
 		GetComponent<EnemyMovement>().enabled = true;
 		animator.ResetTrigger("Die");
 	}
 
 	protected void UpdateHealthBar()
 	{
-		if (healthBar != null)
-			healthBar.fillAmount = currentHealth / maxHealth;
+		if (healthValue != null)
+			healthValue.fillAmount = currentHealth / maxHealth;
 	}
 }

@@ -2,7 +2,7 @@ public class Orc : BaseEnemy
 {
 	protected override void Awake()
 	{
-		maxHealth = 10000f;
+		maxHealth = 50f;
 		base.Awake();
 	}
 	

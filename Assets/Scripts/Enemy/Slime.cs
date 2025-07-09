@@ -9,9 +9,9 @@ public class Slime : BaseEnemy
 	[SerializeField] private string specialSlimeTag = "SpecialSlime";
 	[SerializeField] private string cloneSlimeTag = "CloneSlime";
 
-	private Vector2 splitDirection;
 	private int splitWaypointIndex;
 	private bool hasSplit = false;
+	private bool isSplitting = false;
 
 	protected override void Awake()
 	{
@@ -24,14 +24,19 @@ public class Slime : BaseEnemy
 
 	public override void TakeDamage(float amount)
 	{
-		if (slimeType == SlimeType.Special)
-			return;
-
 		base.TakeDamage(amount);
 	}
 
 	protected override void Die()
 	{
+		if (slimeType == SlimeType.Special && isSplitting && !hasSplit)
+		{
+			// Don't spawn clones
+			isSplitting = false;
+			hasSplit = true; // Mark it to prevent double trigger
+		}
+
+
 		if (slimeType != SlimeType.Normal)
 		{
 			base.Die();
@@ -52,7 +57,8 @@ public class Slime : BaseEnemy
 			GameObject special = ObjectPool.Instance.SpawnFromPool(specialSlimeTag, spawnPos, Quaternion.identity);
 			if (special != null && special.TryGetComponent<Slime>(out var specialSlime))
 			{
-				special.SetActive(true);
+				specialSlime.ResetEnemy();
+
 				specialSlime.slimeType = SlimeType.Special;
 				specialSlime.StartSplit(direction, pathIndex);
 			}
@@ -68,6 +74,7 @@ public class Slime : BaseEnemy
 		moveDirection = inheritedDirection;
 		splitWaypointIndex = pathIndex;
 		hasSplit = false;
+		isSplitting = true;
 
 		animator.SetFloat("MoveX", moveDirection.x);
 		animator.SetFloat("MoveY", moveDirection.y);
@@ -79,8 +86,15 @@ public class Slime : BaseEnemy
 	// Animation event should call this at the END of the Split animation
 	public void OnSplitAnimationComplete()
 	{
-		if (hasSplit) return;
+		//if (hasSplit) return;
+		if (hasSplit || currentHealth <= 0f)
+		{
+			isSplitting = false;
+			return; // Already dead or split done
+		}
+
 		hasSplit = true;
+		isSplitting = false;
 
 		SpawnClone(transform.position + new Vector3(-0.3f, 0), -0.15f);
 		SpawnClone(transform.position + new Vector3(0.3f, 0), 0.15f);
@@ -95,6 +109,9 @@ public class Slime : BaseEnemy
 		{
 			slime.slimeType = SlimeType.Clone;
 			slime.ResetEnemy();
+			float healthPercent = currentHealth / maxHealth;
+			slime.currentHealth = slime.maxHealth * healthPercent;
+			slime.UpdateHealthBar();
 
 			if (clone.TryGetComponent<EnemyMovement>(out var movement))
 			{
@@ -109,6 +126,8 @@ public class Slime : BaseEnemy
 	public override void ResetEnemy()
 	{
 		base.ResetEnemy();
+		isSplitting = false;
+		hasSplit = false;
 		GetComponent<EnemyMovement>().enabled = (slimeType != SlimeType.Special);
 	}
 }

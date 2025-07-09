@@ -1,40 +1,71 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Tower : MonoBehaviour
 {
 	[Header("Tower Configuration")]
 	[SerializeField] private List<TowerLevelData> levelData;
 	[SerializeField] private Transform visualRoot;
+	public TowerLevelData PreviewLevelData => levelData != null && levelData.Count > 0 ? levelData[0] : null;
 
 	private SpriteRenderer spriteRenderer;
 	private GameObject currentVisual;
 	private Animator currentAnimator;
 	private readonly List<Archer> archerList = new();
 
-	private int currentLevel = -1; // Start at -1 so level 0 is first upgrade
+	private int currentLevel = -1; // -1 = unbuilt, 0+ = built
 
-	/// <summary>
-	/// Can upgrade if next level is within bounds
-	/// </summary>
+	public bool IsBuilt => currentLevel >= 0;
 	public bool CanUpgrade => currentLevel + 1 < levelData.Count;
 
 	private void Start()
 	{
 		spriteRenderer = GetComponent<SpriteRenderer>();
+		spriteRenderer.enabled = false; 
 
 		if (levelData == null || levelData.Count == 0)
 		{
 			Debug.LogWarning("[Tower] No level data assigned.");
-			return;
 		}
 
-		StartCoroutine(AutoUpgradeAfterDelay(10f));
+		//Debug.Log($"[Tower] {PreviewLevelData.archerCount}.");
+	}
+
+	private void Update()
+	{
+		HandleMouseClick(); 
+	}
+
+	private void HandleMouseClick()
+	{
+		if (Mouse.current == null || !Mouse.current.leftButton.wasPressedThisFrame)
+			return;
+
+		if (UIBlocked()) return;
+
+		Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+		Collider2D hit = Physics2D.OverlapPoint(mouseWorldPos);
+
+		if (hit != null && hit.gameObject == this.gameObject)
+		{
+			if (IsBuilt)
+				UIManager.Instance.ShowSelectedTowerPanel(this); // upgrade/sell
+			else
+			{
+				UIManager.Instance.ShowTowerBuildPanel(false, this); // build
+			}
+		}
+	}
+
+	private bool UIBlocked()
+	{
+		return UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject();
 	}
 
 	/// <summary>
-	/// Attempts to upgrade the tower to the next level
+	/// Triggered by UI button (on build or upgrade)
 	/// </summary>
 	public void Upgrade()
 	{
@@ -44,31 +75,31 @@ public class Tower : MonoBehaviour
 			return;
 		}
 
-		int nextLevel = currentLevel + 1;
-		StartCoroutine(ApplyLevelCoroutine(nextLevel));
+		StartCoroutine(ApplyLevelCoroutine(currentLevel + 1));
 	}
 
 	/// <summary>
-	/// Applies the given tower level: visuals, animation, and setup
+	/// Main logic for applying tower level (visuals + animation wait)
 	/// </summary>
 	private IEnumerator ApplyLevelCoroutine(int levelIndex)
 	{
 		if (levelIndex < 0 || levelIndex >= levelData.Count)
 		{
-			Debug.LogError($"[Tower] Invalid level index {levelIndex}");
+			Debug.LogError($"[Tower] Invalid level index: {levelIndex}");
 			yield break;
 		}
 
 		currentLevel = levelIndex;
 		TowerLevelData data = levelData[currentLevel];
 
-		// Despawn current visual
+		// Despawn previous visual
 		if (currentVisual != null)
 		{
 			ObjectPool.Instance.DespawnToPool(currentVisual);
 			currentVisual = null;
 		}
 
+		// Spawn new visual
 		string visualTag = $"Tower{currentLevel + 1}";
 		currentVisual = ObjectPool.Instance.SpawnFromPool(visualTag, visualRoot.position, Quaternion.identity, visualRoot);
 
@@ -79,15 +110,15 @@ public class Tower : MonoBehaviour
 		}
 
 		currentVisual.transform.SetParent(visualRoot, false);
+
 		DespawnAllArchers();
 
-		// Setup event relay
+		// Setup relay for animation callbacks
 		if (currentVisual.TryGetComponent(out TowerEventRelay relay))
 			relay.SetTower(this);
 
+		// Wait for idle animation to finish
 		currentAnimator = currentVisual.GetComponent<Animator>();
-
-		// Wait for idle animation state
 		if (currentAnimator != null)
 		{
 			yield return new WaitUntil(() =>
@@ -99,11 +130,11 @@ public class Tower : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Called via animation event after upgrade visuals are done
+	/// Called via animation event after idle transition
 	/// </summary>
 	public void InitializeArchersForLevel()
 	{
-		if (currentLevel < 0 || currentLevel >= levelData.Count)
+		if (!IsBuilt || currentLevel >= levelData.Count)
 		{
 			Debug.LogError($"[Tower] Invalid level index for archer init: {currentLevel}");
 			return;
@@ -168,15 +199,48 @@ public class Tower : MonoBehaviour
 		return slots;
 	}
 
-	private IEnumerator AutoUpgradeAfterDelay(float delay)
+	public TowerLevelData GetNextLevelData()
 	{
-		while (CanUpgrade)
-		{
-			yield return new WaitForSeconds(delay);
-			Upgrade();
-
-			if (spriteRenderer.enabled)
-				spriteRenderer.enabled = false;
-		}
+		return CanUpgrade ? levelData[currentLevel + 1] : null;
 	}
+
+	public void Sell()
+	{
+		if (!IsBuilt)
+		{
+			Debug.LogWarning("[Tower] Tried to sell an unbuilt tower.");
+			return;
+		}
+
+		// Refund partial coin (e.g., 50% of total invested)
+		int refund = 0;
+		for (int i = 0; i <= currentLevel; i++)
+			refund += Mathf.FloorToInt(levelData[i].cost * 0.5f);
+
+		GameManager.Instance.AddCoins(refund);
+		Debug.Log($"[Tower] Tower sold. Refunded {refund} coins.");
+
+		// Despawn visual
+		if (currentVisual != null)
+		{
+			ObjectPool.Instance.DespawnToPool(currentVisual);
+			currentVisual = null;
+		}
+
+		// Despawn archers
+		DespawnAllArchers();
+
+		// Reset state
+		currentLevel = -1;
+		spriteRenderer.enabled = false;
+	}
+
+	public int GetSellRefundAmount()
+	{
+		int refund = 0;
+		for (int i = 0; i <= currentLevel; i++)
+			refund += Mathf.FloorToInt(levelData[i].cost * 0.5f);
+		return refund;
+	}
+
 }

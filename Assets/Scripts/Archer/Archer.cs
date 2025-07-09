@@ -4,183 +4,209 @@ using UnityEngine;
 
 public class Archer : MonoBehaviour
 {
+	private enum ArcherState
+	{
+		Idle = 1,
+		PreAttack = 2,
+		Attack = 3
+	}
+
 	[Header("Combat Settings")]
 	[SerializeField] private LayerMask enemyLayer;
-	[SerializeField] private float fireRate;
 	[SerializeField] private float range;
+	[SerializeField] private float fireRate;
 
 	[Header("Arrow Settings")]
 	[SerializeField] private Transform arrowSpawnPoint;
 
+	private ArcherState state = ArcherState.Idle;
 	private ArcherAnimationController animController;
-	private BaseEnemy currentTarget;
-	private float cooldownTimer;
-	private bool isPreparingToShoot = false;
-
 	private ArcherTierData archerTierData;
 	private ArrowTierData arrowTierData;
+	private BaseEnemy currentTarget;
+
+	private float cooldownTimer;
+	private bool isPreparingToShoot;
 
 	private void Update()
 	{
-		if (!HasValidTarget())
-		{
-			TryAcquireNewTarget();
-			return;
-		}
-
 		cooldownTimer -= Time.deltaTime;
 
-		if (cooldownTimer <= 0f && !isPreparingToShoot)
+		switch (state)
 		{
-			PrepareToShoot();
+			case ArcherState.Idle:
+				if (SearchForTarget())
+					TransitionToPreAttack();
+				break;
+
+			case ArcherState.PreAttack:
+				// Wait for animation to trigger PerformAttack via Invoke
+				break;
+
+			case ArcherState.Attack:
+				if (!HasValidTarget())
+				{
+					TransitionToIdle();
+				}
+				else if (cooldownTimer <= 0f && !isPreparingToShoot)
+				{
+					PrepareToShoot(); // Next volley
+				}
+				break;
 		}
 	}
 
-	/// <summary> Initialize the archer after pooling or upgrading. </summary>
 	public void Initialize(ArcherTierData archerTier, ArrowTierData arrowTier, float range)
 	{
 		archerTierData = archerTier;
 		arrowTierData = arrowTier;
-		fireRate = archerTierData.shootSpeed;
 		this.range = range;
+		fireRate = archerTierData.shootSpeed;
 
 		if (animController == null)
 			animController = GetComponent<ArcherAnimationController>();
 
+		gameObject.SetActive(true);
 		ResetLogic();
-		gameObject.SetActive(true); // Must be active before rebinding
 
-		var animator = GetComponent<Animator>();
-		if (animator != null)
-		{
-			animator.Rebind();
-		}
+		GetComponent<Animator>()?.Rebind();
 
-		// Delay one frame before searching for target (let physics settle)
-		StartCoroutine(InitializeTargetAfterFrame());
+		StartCoroutine(DelayedSearch());
 	}
 
-	private IEnumerator InitializeTargetAfterFrame()
+	private IEnumerator DelayedSearch()
 	{
 		yield return null;
 
-		currentTarget = FindSmartTargetInRange();
-		animController.SetTarget(currentTarget);
+		if (SearchForTarget())
+			TransitionToPreAttack();
+	}
+
+	private bool SearchForTarget()
+	{
+		currentTarget = FindSmartTarget();
 
 		if (HasValidTarget())
 		{
-			PerformAttack();
+			animController.SetTarget(currentTarget);
+			return true;
 		}
+		return false;
 	}
 
-	/// <summary> Reset state when reused. </summary>
-	public void ResetArcher()
+	private BaseEnemy FindSmartTarget()
 	{
-		CancelInvoke();
-		StopAllCoroutines();
-		ResetLogic();
-		gameObject.SetActive(false);
-	}
+		var hits = Physics2D.OverlapCircleAll(transform.position, range, enemyLayer);
+		BaseEnemy best = null;
+		float bestScore = float.MaxValue;
 
-	/// <summary> Called by animation event. Instantiates arrow(s). </summary>
-	public void FireArrow()
-	{
-		if (!HasValidTarget()) return;
-
-		cooldownTimer = fireRate;
-		List<BaseEnemy> targets = GetValidTargets();
-		int arrowCount = archerTierData.arrowsPerShoot;
-		float spread = 40f;
-
-		for (int i = 0; i < arrowCount; i++)
+		foreach (var hit in hits)
 		{
-			float angle = arrowCount > 1 ? Mathf.Lerp(-spread / 2f, spread / 2f, (float)i / (arrowCount - 1)) : 0f;
-			GameObject arrowGO = ObjectPool.Instance.SpawnFromPool(
-				arrowTierData.arrowPrefab.name,
-				arrowSpawnPoint.position,
-				Quaternion.identity
-			);
+			if (!hit.TryGetComponent(out BaseEnemy enemy)) continue;
+			if (!IsValidTarget(enemy) || !IsInRange(enemy)) continue;
 
-			if (arrowGO.TryGetComponent<Arrow>(out var arrow))
+			float score = enemy.currentHealth + Vector2.Distance(transform.position, enemy.transform.position) * 5f;
+			if (score < bestScore)
 			{
-				BaseEnemy target = i < targets.Count ? targets[i] : currentTarget;
-				arrow.Initialize(target, arrowSpawnPoint.position, arrowTierData, angle);
+				bestScore = score;
+				best = enemy;
 			}
 		}
+		return best;
 	}
 
-	private void ResetLogic()
+	private bool IsInRange(BaseEnemy enemy)
 	{
-		cooldownTimer = 0f;
-		isPreparingToShoot = false;
-		currentTarget = null;
-		animController.SetTarget(null);
-		animController.SetAction(ArcherAction.Idle);
-	}
+		if (enemy == null) return false;
 
-	private void TryAcquireNewTarget()
-	{
-		currentTarget = FindSmartTargetInRange();
-		animController.SetTarget(currentTarget);
-
-		if (!HasValidTarget())
+		if (enemy.TryGetComponent<Collider2D>(out var col))
 		{
-			if (animController.currentAction == ArcherAction.Attack)
-				StartCoroutine(TransitionToIdle());
-			else
-				animController.SetAction(ArcherAction.Idle);
-
-			isPreparingToShoot = false;
+			Vector2 closest = col.ClosestPoint(transform.position);
+			return Vector2.Distance(transform.position, closest) <= range * 0.85f;
 		}
+		return Vector2.Distance(transform.position, enemy.transform.position) <= range * 0.85f;
 	}
 
 	private void PrepareToShoot()
 	{
 		if (!HasValidTarget())
 		{
-			StartCoroutine(TransitionToIdle());
+			TransitionToIdle();
 			return;
 		}
 
 		isPreparingToShoot = true;
 		animController.SetTarget(currentTarget);
 		animController.SetAction(ArcherAction.PreAttack);
-		Invoke(nameof(PerformAttack), 0.1f);
+
+		Invoke(nameof(PerformAttack), 0.3f); // Match animation pre-delay
 	}
 
 	private void PerformAttack()
 	{
 		if (!HasValidTarget())
 		{
-			isPreparingToShoot = false;
-			StartCoroutine(TransitionToIdle());
+			TransitionToIdle();
 			return;
 		}
 
-		isPreparingToShoot = false;
-		animController.SetAction(ArcherAction.Attack);
+		TransitionToAttack();
 	}
 
-	private BaseEnemy FindSmartTargetInRange()
+	private void TransitionToPreAttack()
 	{
-		var hits = Physics2D.OverlapCircleAll(transform.position, range, enemyLayer);
-		BaseEnemy bestTarget = null;
-		float bestScore = float.MaxValue;
+		state = ArcherState.PreAttack;
+		isPreparingToShoot = true;
 
-		foreach (var hit in hits)
+		animController.SetTarget(currentTarget);
+		animController.SetAction(ArcherAction.PreAttack);
+
+		Invoke(nameof(PerformAttack), 0.3f); // You can tweak based on your animation length
+	}
+
+	private void TransitionToAttack()
+	{
+		state = ArcherState.Attack;
+		isPreparingToShoot = false;
+
+		animController.SetAction(ArcherAction.Attack);
+		cooldownTimer = fireRate;
+	}
+
+	private void TransitionToIdle()
+	{
+		state = ArcherState.Idle;
+		currentTarget = null;
+		isPreparingToShoot = false;
+		cooldownTimer = fireRate;
+
+		animController.SetTarget(null);
+		animController.SetAction(ArcherAction.Idle);
+	}
+
+	// Called via animation event
+	private void FireArrow()
+	{
+		var targets = GetValidTargets();
+		int arrowCount = archerTierData.arrowsPerShoot;
+		float spread = 40f;
+
+		for (int i = 0; i < arrowCount; i++)
 		{
-			if (hit.TryGetComponent(out BaseEnemy enemy) && IsValidTarget(enemy))
-			{
-				float score = enemy.currentHealth + Vector2.Distance(transform.position, enemy.transform.position) * 5f;
+			float angle = arrowCount > 1 ? Mathf.Lerp(-spread / 2f, spread / 2f, (float)i / (arrowCount - 1)) : 0f;
 
-				if (score < bestScore)
-				{
-					bestScore = score;
-					bestTarget = enemy;
-				}
+			GameObject arrowGO = ObjectPool.Instance.SpawnFromPool(
+				arrowTierData.arrowPrefab.name,
+				arrowSpawnPoint.position,
+				Quaternion.identity
+			);
+
+			if (arrowGO.TryGetComponent(out Arrow arrow))
+			{
+				BaseEnemy target = i < targets.Count ? targets[i] : currentTarget;
+				arrow.Initialize(target, arrowSpawnPoint.position, arrowTierData, angle);
 			}
 		}
-		return bestTarget;
 	}
 
 	private List<BaseEnemy> GetValidTargets()
@@ -196,30 +222,48 @@ public class Archer : MonoBehaviour
 
 		valid.Sort((a, b) =>
 		{
-			float scoreA = a.currentHealth + Vector2.Distance(transform.position, a.transform.position) * 5f;
-			float scoreB = b.currentHealth + Vector2.Distance(transform.position, b.transform.position) * 5f;
-			return scoreA.CompareTo(scoreB);
+			float aScore = a.currentHealth + Vector2.Distance(transform.position, a.transform.position) * 5f;
+			float bScore = b.currentHealth + Vector2.Distance(transform.position, b.transform.position) * 5f;
+			return aScore.CompareTo(bScore);
 		});
 
 		return valid;
 	}
 
-	private IEnumerator TransitionToIdle()
+	private bool IsValidTarget(BaseEnemy target)
 	{
-		animController.SetAction(ArcherAction.PreAttack);
-		yield return new WaitForSeconds(0.1f);
-		animController.SetAction(ArcherAction.Idle);
+		return target != null && target.gameObject.activeInHierarchy && target.currentHealth > 0;
 	}
 
-	private bool HasValidTarget() => IsValidTarget(currentTarget) && InRange(currentTarget);
+	private bool HasValidTarget()
+	{
+		return IsValidTarget(currentTarget) && IsInRange(currentTarget);
+	}
 
-	private bool IsValidTarget(BaseEnemy target) => target != null && target.gameObject.activeInHierarchy && target.currentHealth > 0;
+	private void ResetLogic()
+	{
+		state = ArcherState.Idle;
+		cooldownTimer = 0f;
+		isPreparingToShoot = false;
+		currentTarget = null;
 
-	private bool InRange(BaseEnemy target) => Vector2.Distance(transform.position, target.transform.position) <= range;
+		animController.SetTarget(null);
+		animController.SetAction(ArcherAction.Idle);
+	}
 
 	private void OnDrawGizmosSelected()
 	{
 		Gizmos.color = Color.green;
 		Gizmos.DrawWireSphere(transform.position, range);
+		Gizmos.color = Color.yellow;
+		Gizmos.DrawWireSphere(transform.position, range * 0.85f);
+	}
+
+	public void ResetArcher()
+	{
+		CancelInvoke();
+		StopAllCoroutines();
+		ResetLogic();
+		gameObject.SetActive(false);
 	}
 }

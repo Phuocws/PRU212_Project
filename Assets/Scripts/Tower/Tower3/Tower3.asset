@@ -14,7 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   towerVisualPrefab: {fileID: 7905720530323522018, guid: 59a9fd7e482972e499ab39717247a455, type: 3}
   archerCount: 2
-  range: 10
+  range: 7
   archerTier: {fileID: 11400000, guid: d3c0fc8fab9da91499154a641244e4cf, type: 2}
   arrowTier: {fileID: 11400000, guid: 0da03a6c9d4986b4680034b640684d2c, type: 2}
-  requiresUpgradeTrigger: 0

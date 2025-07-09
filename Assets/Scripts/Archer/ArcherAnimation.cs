@@ -3,64 +3,38 @@ using System.Collections;
 
 public class ArcherAnimationController : MonoBehaviour
 {
-	[Header("References")]
 	[SerializeField] private Animator animator;
 	[SerializeField] private SpriteRenderer spriteRenderer;
 	[SerializeField] private Transform arrowSpawnPoint;
 
-	[Header("Target & Offset")]
-	[SerializeField] private Transform target;
 	[SerializeField] private Vector2 offsetUp;
 	[SerializeField] private Vector2 offsetDown;
 	[SerializeField] private Vector2 offsetSide;
 
-	[Header("State")]
 	public ArcherAction currentAction = ArcherAction.Idle;
 	private ArcherDirection currentDirection = ArcherDirection.Down;
-
+	private Transform target;
 	private Coroutine idleResetCoroutine;
 
-	#region Public API
+	public void SetTarget(BaseEnemy newTarget)
+	{
+		target = newTarget?.transform;
+		if (target == null)
+		{
+			StartIdleReset();
+		}
+		else
+		{
+			UpdateDirection();
+			CancelIdleReset();
+		}
+	}
 
-	/// <summary>
-	/// Set current action (Idle, Attack, etc.) and refresh animator.
-	/// </summary>
 	public void SetAction(ArcherAction action)
 	{
 		currentAction = action;
-		UpdateDirection();
 		UpdateAnimator();
 	}
-
-	/// <summary>
-	/// Set target for directional aiming and animation.
-	/// </summary>
-	public void SetTarget(BaseEnemy newTarget)
-	{
-		if (newTarget == null)
-		{
-			target = null;
-			if (gameObject.activeInHierarchy)
-				StartDelayedIdleReset();
-			return;
-		}
-
-		target = newTarget.transform;
-		SetDirectionOnly();
-		CancelIdleReset();
-	}
-
-	/// <summary>
-	/// Only update facing direction without changing animation state.
-	/// </summary>
-	public void SetDirectionOnly()
-	{
-		UpdateDirection();
-	}
-
-	#endregion
-
-	#region Internal Direction & Animator
 
 	private void UpdateDirection()
 	{
@@ -71,29 +45,15 @@ public class ArcherAnimationController : MonoBehaviour
 		if (Mathf.Abs(dir.y) > Mathf.Abs(dir.x))
 		{
 			currentDirection = dir.y > 0 ? ArcherDirection.Up : ArcherDirection.Down;
-			if (arrowSpawnPoint != null)
-				arrowSpawnPoint.localPosition = dir.y > 0 ? offsetUp : offsetDown;
+			arrowSpawnPoint.localPosition = dir.y > 0 ? offsetUp : offsetDown;
 		}
 		else
 		{
 			currentDirection = ArcherDirection.Side;
-
-			if (spriteRenderer != null)
-			{
-				bool isFacingRight = dir.x > 0;
-				spriteRenderer.flipX = isFacingRight;
-
-				if (arrowSpawnPoint != null)
-				{
-					arrowSpawnPoint.localPosition = new Vector2(
-						isFacingRight ? Mathf.Abs(offsetSide.x) : -Mathf.Abs(offsetSide.x),
-						offsetSide.y
-					);
-				}
-			}
+			bool facingRight = dir.x > 0;
+			spriteRenderer.flipX = facingRight;
+			arrowSpawnPoint.localPosition = new Vector2(facingRight ? offsetSide.x : -offsetSide.x, offsetSide.y);
 		}
-
-		UpdateAnimator();
 	}
 
 	private void UpdateAnimator()
@@ -102,14 +62,11 @@ public class ArcherAnimationController : MonoBehaviour
 		animator.SetFloat("Direction", (float)currentDirection / 100f);
 	}
 
-	#endregion
-
-	#region Idle Fallback
-
-	private void StartDelayedIdleReset()
+	private void StartIdleReset()
 	{
 		CancelIdleReset();
-		idleResetCoroutine = StartCoroutine(IdleResetAfterDelay(4f));
+		if (isActiveAndEnabled)
+			idleResetCoroutine = StartCoroutine(IdleAfterDelay(4f));
 	}
 
 	private void CancelIdleReset()
@@ -121,16 +78,11 @@ public class ArcherAnimationController : MonoBehaviour
 		}
 	}
 
-	private IEnumerator IdleResetAfterDelay(float delay)
+	private IEnumerator IdleAfterDelay(float delay)
 	{
 		yield return new WaitForSeconds(delay);
-
+		SetAction(ArcherAction.Idle);
 		currentDirection = ArcherDirection.Down;
-		currentAction = ArcherAction.Idle;
 		UpdateAnimator();
-
-		idleResetCoroutine = null;
 	}
-
-	#endregion
 }

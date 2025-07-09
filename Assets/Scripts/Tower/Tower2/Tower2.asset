@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Tower2
   m_EditorClassIdentifier: 
   towerVisualPrefab: {fileID: 8341217654168697538, guid: 1023c872079a03148a1b86bcf02d7976, type: 3}
+  displayName: Archer Tower 2
+  description: Archer shoot broadhead arrows. Dealing more damage. thier longbows
+    have a longer attack range.
+  cost: 25
   archerCount: 1
-  range: 20
+  range: 6
   archerTier: {fileID: 11400000, guid: ee08059d2a364254d8bab82dcdcdb4cc, type: 2}
   arrowTier: {fileID: 11400000, guid: b7ebaecf77f2d4749bddce31dd1ddd0e, type: 2}
-  requiresUpgradeTrigger: 0
