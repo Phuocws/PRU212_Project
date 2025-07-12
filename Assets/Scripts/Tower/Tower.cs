@@ -8,35 +8,37 @@ public class Tower : MonoBehaviour
 	[Header("Tower Configuration")]
 	[SerializeField] private List<TowerLevelData> levelData;
 	[SerializeField] private Transform visualRoot;
+	[SerializeField] private GameObject currentRangeIndicator;
+	[SerializeField] private GameObject upgradeRangeIndicator;
 	public TowerLevelData PreviewLevelData => levelData != null && levelData.Count > 0 ? levelData[0] : null;
 
-	private SpriteRenderer spriteRenderer;
 	private GameObject currentVisual;
 	private Animator currentAnimator;
 	private readonly List<Archer> archerList = new();
-
-	private int currentLevel = -1; // -1 = unbuilt, 0+ = built
+	private int currentLevel = -1;
 
 	public bool IsBuilt => currentLevel >= 0;
 	public bool CanUpgrade => currentLevel + 1 < levelData.Count;
 
+	#region Unity Lifecycle
+
 	private void Start()
 	{
-		spriteRenderer = GetComponent<SpriteRenderer>();
-		spriteRenderer.enabled = false; 
-
 		if (levelData == null || levelData.Count == 0)
-		{
 			Debug.LogWarning("[Tower] No level data assigned.");
-		}
 
-		//Debug.Log($"[Tower] {PreviewLevelData.archerCount}.");
+		HideBothRange();
+		UpdateRangeVisual();
 	}
 
 	private void Update()
 	{
-		HandleMouseClick(); 
+		HandleMouseClick();
 	}
+
+	#endregion
+
+	#region Mouse Click
 
 	private void HandleMouseClick()
 	{
@@ -48,14 +50,12 @@ public class Tower : MonoBehaviour
 		Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
 		Collider2D hit = Physics2D.OverlapPoint(mouseWorldPos);
 
-		if (hit != null && hit.gameObject == this.gameObject)
+		if (hit != null && hit.gameObject == gameObject)
 		{
 			if (IsBuilt)
-				UIManager.Instance.ShowSelectedTowerPanel(this); // upgrade/sell
+				UIManager.Instance.ShowSelectedTowerPanel(this);
 			else
-			{
-				UIManager.Instance.ShowTowerBuildPanel(false, this); // build
-			}
+				UIManager.Instance.ShowTowerBuildPanel(false, this);
 		}
 	}
 
@@ -64,9 +64,10 @@ public class Tower : MonoBehaviour
 		return UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject();
 	}
 
-	/// <summary>
-	/// Triggered by UI button (on build or upgrade)
-	/// </summary>
+	#endregion
+
+	#region Upgrade / Build
+
 	public void Upgrade()
 	{
 		if (!CanUpgrade)
@@ -78,9 +79,6 @@ public class Tower : MonoBehaviour
 		StartCoroutine(ApplyLevelCoroutine(currentLevel + 1));
 	}
 
-	/// <summary>
-	/// Main logic for applying tower level (visuals + animation wait)
-	/// </summary>
 	private IEnumerator ApplyLevelCoroutine(int levelIndex)
 	{
 		if (levelIndex < 0 || levelIndex >= levelData.Count)
@@ -92,14 +90,15 @@ public class Tower : MonoBehaviour
 		currentLevel = levelIndex;
 		TowerLevelData data = levelData[currentLevel];
 
-		// Despawn previous visual
+		// Despawn old
 		if (currentVisual != null)
 		{
 			ObjectPool.Instance.DespawnToPool(currentVisual);
 			currentVisual = null;
 		}
+		DespawnAllArchers();
 
-		// Spawn new visual
+		// Spawn new
 		string visualTag = $"Tower{currentLevel + 1}";
 		currentVisual = ObjectPool.Instance.SpawnFromPool(visualTag, visualRoot.position, Quaternion.identity, visualRoot);
 
@@ -108,16 +107,11 @@ public class Tower : MonoBehaviour
 			Debug.LogError($"[Tower] Failed to spawn visual: {visualTag}");
 			yield break;
 		}
-
 		currentVisual.transform.SetParent(visualRoot, false);
 
-		DespawnAllArchers();
-
-		// Setup relay for animation callbacks
 		if (currentVisual.TryGetComponent(out TowerEventRelay relay))
 			relay.SetTower(this);
 
-		// Wait for idle animation to finish
 		currentAnimator = currentVisual.GetComponent<Animator>();
 		if (currentAnimator != null)
 		{
@@ -127,11 +121,10 @@ public class Tower : MonoBehaviour
 				return state.IsTag("Idle") && state.normalizedTime >= 1f;
 			});
 		}
+
+		UpdateRangeVisual();
 	}
 
-	/// <summary>
-	/// Called via animation event after idle transition
-	/// </summary>
 	public void InitializeArchersForLevel()
 	{
 		if (!IsBuilt || currentLevel >= levelData.Count)
@@ -157,9 +150,9 @@ public class Tower : MonoBehaviour
 
 			archerGO.transform.SetParent(slot, false);
 
-			if (archerGO.TryGetComponent<Archer>(out var archer))
+			if (archerGO.TryGetComponent(out Archer archer))
 			{
-				archer.Initialize(data.archerTier, data.arrowTier, data.range);
+				archer.Initialize(data.archerTier, data.arrowTier, data.range, transform);
 				archerList.Add(archer);
 			}
 			else
@@ -181,6 +174,10 @@ public class Tower : MonoBehaviour
 		}
 		archerList.Clear();
 	}
+
+	#endregion
+
+	#region Utility
 
 	private List<Transform> FindArcherSlots(GameObject visual)
 	{
@@ -204,6 +201,10 @@ public class Tower : MonoBehaviour
 		return CanUpgrade ? levelData[currentLevel + 1] : null;
 	}
 
+	#endregion
+
+	#region Sell
+
 	public void Sell()
 	{
 		if (!IsBuilt)
@@ -212,27 +213,24 @@ public class Tower : MonoBehaviour
 			return;
 		}
 
-		// Refund partial coin (e.g., 50% of total invested)
+		// Refund logic
 		int refund = 0;
 		for (int i = 0; i <= currentLevel; i++)
 			refund += Mathf.FloorToInt(levelData[i].cost * 0.5f);
-
 		GameManager.Instance.AddCoins(refund);
-		Debug.Log($"[Tower] Tower sold. Refunded {refund} coins.");
 
-		// Despawn visual
+		// Reset state
 		if (currentVisual != null)
 		{
 			ObjectPool.Instance.DespawnToPool(currentVisual);
 			currentVisual = null;
 		}
-
-		// Despawn archers
 		DespawnAllArchers();
 
-		// Reset state
 		currentLevel = -1;
-		spriteRenderer.enabled = false;
+		HideBothRange();
+		ResetRangeScales();
+		UpdateRangeVisual(); // for new preview upgrade range
 	}
 
 	public int GetSellRefundAmount()
@@ -243,4 +241,76 @@ public class Tower : MonoBehaviour
 		return refund;
 	}
 
+	#endregion
+
+	#region Range Visuals
+
+	private void UpdateRangeVisual()
+	{
+		// Preview upgrade range
+		float diameter = PreviewLevelData.range * 2f;
+		upgradeRangeIndicator.transform.localScale = new Vector3(diameter, diameter, 1f);
+
+		// Built tower range
+		if (IsBuilt && currentLevel < levelData.Count)
+		{
+			float currentRange = levelData[currentLevel].range * 2f;
+			currentRangeIndicator.transform.localScale = new Vector3(currentRange, currentRange, 1f);
+		}
+
+		// Next upgrade range
+		if (CanUpgrade)
+		{
+			float upgradeRange = levelData[currentLevel + 1].range * 2f;
+			upgradeRangeIndicator.transform.localScale = new Vector3(upgradeRange, upgradeRange, 1f);
+		}
+	}
+
+	private void ResetRangeScales()
+	{
+		currentRangeIndicator.transform.localScale = Vector3.zero;
+		upgradeRangeIndicator.transform.localScale = Vector3.zero;
+	}
+
+	public void ShowCurrentRange() => currentRangeIndicator.SetActive(true);
+	public void HideCurrentRange() => currentRangeIndicator.SetActive(false);
+
+	public void ShowUpgradeRange()
+	{
+		if (CanUpgrade)
+		{
+			upgradeRangeIndicator.SetActive(true);
+			UpdateRangeVisual();
+		}
+	}
+
+	public void HideUpgradeRange() => upgradeRangeIndicator.SetActive(false);
+
+	public void ShowRange()
+	{
+		ShowCurrentRange();
+		HideUpgradeRange();
+	}
+
+	public void ShowUpgradeRangeOnly()
+	{
+		HideCurrentRange();
+		ResetRangeScales();
+		UpdateRangeVisual();
+		ShowUpgradeRange();
+	}
+
+	public void ShowBothRange()
+	{
+		ShowCurrentRange();
+		ShowUpgradeRange();
+	}
+
+	public void HideBothRange()
+	{
+		HideCurrentRange();
+		HideUpgradeRange();
+	}
+
+	#endregion
 }

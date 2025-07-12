@@ -13,7 +13,7 @@ public class Archer : MonoBehaviour
 
 	[Header("Combat Settings")]
 	[SerializeField] private LayerMask enemyLayer;
-	[SerializeField] private float range;
+	//[SerializeField] private float range;
 	[SerializeField] private float fireRate;
 
 	[Header("Arrow Settings")]
@@ -27,6 +27,9 @@ public class Archer : MonoBehaviour
 
 	private float cooldownTimer;
 	private bool isPreparingToShoot;
+
+	private Transform towerCenter;
+	private float towerRange;
 
 	private void Update()
 	{
@@ -56,11 +59,13 @@ public class Archer : MonoBehaviour
 		}
 	}
 
-	public void Initialize(ArcherTierData archerTier, ArrowTierData arrowTier, float range)
+	public void Initialize(ArcherTierData archerTier, ArrowTierData arrowTier, float range, Transform center)
 	{
 		archerTierData = archerTier;
 		arrowTierData = arrowTier;
-		this.range = range;
+		towerRange = range;
+		towerCenter = center;
+
 		fireRate = archerTierData.shootSpeed;
 
 		if (animController == null)
@@ -69,7 +74,7 @@ public class Archer : MonoBehaviour
 		gameObject.SetActive(true);
 		ResetLogic();
 
-		GetComponent<Animator>()?.Rebind();
+		GetComponent<Animator>().Rebind();
 
 		StartCoroutine(DelayedSearch());
 	}
@@ -96,16 +101,16 @@ public class Archer : MonoBehaviour
 
 	private BaseEnemy FindSmartTarget()
 	{
-		var hits = Physics2D.OverlapCircleAll(transform.position, range, enemyLayer);
+		var hits = Physics2D.OverlapCircleAll(towerCenter.position, towerRange, enemyLayer);
 		BaseEnemy best = null;
 		float bestScore = float.MaxValue;
 
 		foreach (var hit in hits)
 		{
 			if (!hit.TryGetComponent(out BaseEnemy enemy)) continue;
-			if (!IsValidTarget(enemy) || !IsInRange(enemy)) continue;
+			if (!IsValidTarget(enemy) || !IsInTowerRange(enemy)) continue;
 
-			float score = enemy.currentHealth + Vector2.Distance(transform.position, enemy.transform.position) * 5f;
+			float score = enemy.currentHealth + Vector2.Distance(towerCenter.position, enemy.transform.position) * 5f;
 			if (score < bestScore)
 			{
 				bestScore = score;
@@ -115,16 +120,16 @@ public class Archer : MonoBehaviour
 		return best;
 	}
 
-	private bool IsInRange(BaseEnemy enemy)
+	private bool IsInTowerRange(BaseEnemy enemy)
 	{
 		if (enemy == null) return false;
 
 		if (enemy.TryGetComponent<Collider2D>(out var col))
 		{
-			Vector2 closest = col.ClosestPoint(transform.position);
-			return Vector2.Distance(transform.position, closest) <= range * 0.85f;
+			Vector2 closest = col.ClosestPoint(towerCenter.position);
+			return Vector2.Distance(towerCenter.position, closest) <= towerRange * 0.85f;
 		}
-		return Vector2.Distance(transform.position, enemy.transform.position) <= range * 0.85f;
+		return Vector2.Distance(towerCenter.position, enemy.transform.position) <= towerRange * 0.85f;
 	}
 
 	private void PrepareToShoot()
@@ -211,7 +216,7 @@ public class Archer : MonoBehaviour
 
 	private List<BaseEnemy> GetValidTargets()
 	{
-		var hits = Physics2D.OverlapCircleAll(transform.position, range, enemyLayer);
+		var hits = Physics2D.OverlapCircleAll(towerCenter.position, towerRange, enemyLayer);
 		List<BaseEnemy> valid = new();
 
 		foreach (var hit in hits)
@@ -222,8 +227,8 @@ public class Archer : MonoBehaviour
 
 		valid.Sort((a, b) =>
 		{
-			float aScore = a.currentHealth + Vector2.Distance(transform.position, a.transform.position) * 5f;
-			float bScore = b.currentHealth + Vector2.Distance(transform.position, b.transform.position) * 5f;
+			float aScore = a.currentHealth + Vector2.Distance(towerCenter.position, a.transform.position) * 5f;
+			float bScore = b.currentHealth + Vector2.Distance(towerCenter.position, b.transform.position) * 5f;
 			return aScore.CompareTo(bScore);
 		});
 
@@ -237,7 +242,7 @@ public class Archer : MonoBehaviour
 
 	private bool HasValidTarget()
 	{
-		return IsValidTarget(currentTarget) && IsInRange(currentTarget);
+		return IsValidTarget(currentTarget) && IsInTowerRange(currentTarget);
 	}
 
 	private void ResetLogic()
@@ -254,9 +259,9 @@ public class Archer : MonoBehaviour
 	private void OnDrawGizmosSelected()
 	{
 		Gizmos.color = Color.green;
-		Gizmos.DrawWireSphere(transform.position, range);
+		Gizmos.DrawWireSphere(towerCenter.position, towerRange);
 		Gizmos.color = Color.yellow;
-		Gizmos.DrawWireSphere(transform.position, range * 0.85f);
+		Gizmos.DrawWireSphere(towerCenter.position, towerRange * 0.85f);
 	}
 
 	public void ResetArcher()

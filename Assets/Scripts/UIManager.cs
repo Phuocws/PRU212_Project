@@ -1,6 +1,4 @@
-using System.Collections;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -152,7 +150,9 @@ public class UIManager : MonoBehaviour
 		if (!isWaveDetailShown)
 		{
 			ShowWaveDetail();
-			HideAllTowerPanels();
+			// Only hide if something was actually open
+			if (isTowerPanelShown || selectedTowerPanel.activeSelf || detailsPanel.activeSelf)
+				HideAllTowerPanels();
 		}
 		else
 		{
@@ -164,16 +164,18 @@ public class UIManager : MonoBehaviour
 
 	private void OnArcherTowerButtonClicked()
 	{
-		// ======= Upgrade Logic =======
-		if (selectedTower != null && selectedTower.IsBuilt)
+		if (selectedTower == null) return;
+
+		if (selectedTower.IsBuilt)
 		{
+			// ======= Upgrade Logic =======
 			if (!selectedTower.CanUpgrade)
 			{
 				Debug.LogWarning("[UIManager] Tower already at max level.");
 				return;
 			}
 
-			TowerLevelData nextLevel = selectedTower.GetNextLevelData();
+			var nextLevel = selectedTower.GetNextLevelData();
 
 			if (!GameManager.Instance.SpendCoins(nextLevel.cost))
 			{
@@ -181,7 +183,6 @@ public class UIManager : MonoBehaviour
 				return;
 			}
 
-			Debug.Log("[UIManager] Upgrading selected tower!");
 			selectedTower.Upgrade();
 			HideAllTowerPanels();
 			return;
@@ -190,11 +191,12 @@ public class UIManager : MonoBehaviour
 		// ======= Build Logic =======
 		if (selectedBuildType != "Archer")
 		{
-			// First click: highlight and wait for confirmation
+			// First click = confirm intent
 			selectedBuildType = "Archer";
 			buildCheckedIcon.SetActive(true);
 			towerIcon.SetActive(false);
-
+			
+			selectedTower.ShowUpgradeRangeOnly();
 			ShowTowerDetails(
 				selectedTower.PreviewLevelData.displayName,
 				selectedTower.PreviewLevelData.description,
@@ -204,7 +206,7 @@ public class UIManager : MonoBehaviour
 			return;
 		}
 
-		// Second click: confirm + build
+		// Second click = build
 		if (!GameManager.Instance.SpendCoins(selectedTower.PreviewLevelData.cost))
 		{
 			Debug.LogWarning("[UIManager] Not enough coins to build Archer Tower.");
@@ -213,9 +215,9 @@ public class UIManager : MonoBehaviour
 
 		selectedTower.Upgrade(); // Build is just first level upgrade
 		firstTowerBuilt = true; // Mark first tower built
-		if (buildTowerPanel.activeInHierarchy)
-			buildTowerPanel.SetActive(false);
 
+		buildTowerPanel.SetActive(false);
+		selectedTower.HideUpgradeRange(); // Hide upgrade range
 		HideAllTowerPanels();
 
 		// Reset confirmation
@@ -233,12 +235,11 @@ public class UIManager : MonoBehaviour
 			return;
 		}
 
-		TowerLevelData nextLevel = selectedTower.GetNextLevelData();
+		var nextLevel = selectedTower.GetNextLevelData();
 
 		if (!upgradeConfirmed)
 		{
 			// First click: Show check icon
-			Debug.Log("[UIManager] Click again to confirm upgrade.");
 			upgradeConfirmed = true;
 			upgradeCheckedIcon.SetActive(true);
 			upgradeIcon.SetActive(false);
@@ -248,6 +249,8 @@ public class UIManager : MonoBehaviour
 				nextLevel.description,
 				nextLevel.arrowTier.damage
 			);
+
+			selectedTower.ShowBothRange();
 
 			if (sellConfirmed)
 			{
@@ -267,7 +270,6 @@ public class UIManager : MonoBehaviour
 			return;
 		}
 
-		Debug.Log("[UIManager] Upgrade confirmed.");
 		selectedTower.Upgrade();
 		HideAllTowerPanels();
 
@@ -285,7 +287,6 @@ public class UIManager : MonoBehaviour
 		if (!sellConfirmed)
 		{
 			// First click: Show check icon
-			Debug.Log("[UIManager] Click again to confirm sell.");
 			sellConfirmed = true;
 			sellCheckedIcon.SetActive(true);
 			sellIcon.SetActive(false);
@@ -311,7 +312,6 @@ public class UIManager : MonoBehaviour
 		}
 
 		// Second click: Confirm sell
-		Debug.Log("[UIManager] Sell confirmed.");
 		selectedTower.Sell();
 		HideAllTowerPanels();
 
@@ -330,26 +330,13 @@ public class UIManager : MonoBehaviour
 				if (isWaveDetailShown)
 					HideWaveDetail();
 
-				// Hide Tower Build Panel if shown
-				if (!towerPanelJustOpened && isTowerPanelShown)
-				{
-					HideTowerBuildPanel();
-				}
-				// Hide Selected Tower Panel (upgrade/sell) if open
-				if (!towerPanelJustOpened && selectedTowerPanel.activeSelf)
-				{
-					selectedTowerPanel.SetActive(false);
-					selectedTower = null;
+				bool shouldHide = !towerPanelJustOpened &&
+					(isTowerPanelShown || selectedTowerPanel.activeSelf || detailsPanel.activeSelf);
 
-					// Also reset upgrade state
-					upgradeConfirmed = false;
-					upgradeCheckedIcon.SetActive(false);
-					upgradeIcon.SetActive(true);
-				}
-				// Hide Details Panel if open
-				if (detailsPanel.activeSelf)
+				if (shouldHide)
 				{
-					HideTowerDetails();
+					// This will reset all towers, hide ranges, reset confirmations, etc.
+					HideAllTowerPanels();
 				}
 			}
 		}
@@ -421,6 +408,7 @@ public class UIManager : MonoBehaviour
 		selectedTowerPanel.SetActive(true);
 
 		selectedTower = tower;
+		selectedTower.ShowRange(); // Show range indicator
 
 		// Upgrade setup
 		upgradeConfirmed = false;
@@ -447,6 +435,8 @@ public class UIManager : MonoBehaviour
 	{
 		HideTowerBuildPanel();
 		selectedTowerPanel.SetActive(false);
+
+		selectedTower?.HideBothRange();
 		selectedTower = null;
 
 		selectedBuildType = null;
