@@ -59,6 +59,7 @@ public class EnemySpawner : MonoBehaviour
 			startWaveButton.SetActive(true);
 			EnemyTracker.Instance.ResetTracker(); // Reset enemy tracker
 			waveUIManager.StartFirstWaveButton();
+			gameUIManager.SetWaves(currentWaveIndex, waves.Length);
 		}
 	}
 
