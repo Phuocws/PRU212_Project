@@ -13,7 +13,6 @@ public class Archer : MonoBehaviour
 
 	[Header("Combat Settings")]
 	[SerializeField] private LayerMask enemyLayer;
-	//[SerializeField] private float range;
 	[SerializeField] private float fireRate;
 
 	[Header("Arrow Settings")]

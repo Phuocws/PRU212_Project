@@ -9,7 +9,8 @@ public class EnemySpawner : MonoBehaviour
 	[SerializeField] private EnemyWave[] waves;
 	[SerializeField] private Transform spawnPoint;
 	[SerializeField] private float delayBetweenWaves = 5f;
-	[SerializeField] private UIManager uiManager;
+	[SerializeField] private WaveUIManager waveUIManager;
+	[SerializeField] private GameUIManager gameUIManager;
 	[SerializeField] private GameObject startWaveButton;
 
 	private int currentWaveIndex = 0;
@@ -57,7 +58,7 @@ public class EnemySpawner : MonoBehaviour
 		{
 			startWaveButton.SetActive(true);
 			EnemyTracker.Instance.ResetTracker(); // Reset enemy tracker
-			uiManager.StartFirstWaveButton();
+			waveUIManager.StartFirstWaveButton();
 		}
 	}
 
@@ -152,7 +153,7 @@ public class EnemySpawner : MonoBehaviour
 		enemyTypeIndex = 0;
 		spawnedOfCurrentType = 0;
 
-		uiManager.SetWaves(currentWaveIndex + 1, waves.Length);
+		gameUIManager.SetWaves(currentWaveIndex + 1, waves.Length);
 	}
 
 	public bool IsAllWavesComplete()
@@ -175,7 +176,7 @@ public class EnemySpawner : MonoBehaviour
 			isWaitingForNextWave = true;
 			currentWaveIndex++;
 
-			uiManager.StartCountdown(delayBetweenWaves, true);
+			waveUIManager.StartCountdown(delayBetweenWaves, true);
 		}
 		else
 		{
@@ -189,7 +190,7 @@ public class EnemySpawner : MonoBehaviour
 		if (IsAllWavesComplete()) return;
 
 		startWaveButton.SetActive(false);
-		uiManager.ForceStopCountdown();
+		waveUIManager.ForceStopCountdown();
 
 		isWaitingForPlayerStart = false;
 		StartWave();

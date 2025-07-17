@@ -39,14 +39,14 @@ public class GameManager : MonoBehaviour
 
 		isGameOver = false;
 
-		UIManager.Instance.SetHearts(CurrentHearts);
-		UIManager.Instance.SetCoins(CurrentCoints);
+		GameUIManager.Instance.SetHearts(CurrentHearts);
+		GameUIManager.Instance.SetCoins(CurrentCoints);
 	}
 
 	public void AddCoins(int amount)
 	{
 		CurrentCoints += amount;
-		UIManager.Instance.SetCoins(CurrentCoints);
+		GameUIManager.Instance.SetCoins(CurrentCoints);
 	}
 
 	public bool SpendCoins(int amount)
@@ -54,7 +54,7 @@ public class GameManager : MonoBehaviour
 		if (CurrentCoints < amount) return false;
 
 		CurrentCoints -= amount;
-		UIManager.Instance.SetCoins(CurrentCoints);
+		GameUIManager.Instance.SetCoins(CurrentCoints);
 		return true;
 	}
 
@@ -63,7 +63,7 @@ public class GameManager : MonoBehaviour
 		if (isGameOver) return;
 
 		CurrentHearts -= amount;
-		UIManager.Instance.SetHearts(CurrentHearts);
+		GameUIManager.Instance.SetHearts(CurrentHearts);
 
 		if (CurrentHearts <= 0)
 		{

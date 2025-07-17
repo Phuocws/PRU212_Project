@@ -53,9 +53,11 @@ public class Tower : MonoBehaviour
 		if (hit != null && hit.gameObject == gameObject)
 		{
 			if (IsBuilt)
-				UIManager.Instance.ShowSelectedTowerPanel(this);
+				TowerUIManager.Instance.ShowSelectedTowerPanel(this);
 			else
-				UIManager.Instance.ShowTowerBuildPanel(false, this);
+			{
+				TowerUIManager.Instance.ShowTowerBuildPanel(false, this);
+			}
 		}
 	}
 
