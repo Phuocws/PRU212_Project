@@ -80,7 +80,7 @@ public class Arrow : MonoBehaviour
 				enemy.TakeDamage(10);
 				if (bloodPrefab != null)
 				{
-					Destroy(Instantiate(bloodPrefab, target.transform.position, Quaternion.identity), 1f);
+					GameObject blood = ObjectPool.Instance.SpawnFromPool("BloodEffect", target.transform.position, Quaternion.identity);
 				}
 			}
 			gameObject.SetActive(false);
@@ -141,7 +141,7 @@ public class Arrow : MonoBehaviour
 
 		if (bloodPrefab != null)
 		{
-			Destroy(Instantiate(bloodPrefab, collision.transform.position, Quaternion.identity), 1f);
+			GameObject blood = ObjectPool.Instance.SpawnFromPool("BloodEffect", target.transform.position, Quaternion.identity);
 		}
 		gameObject.SetActive(false);
 	}
