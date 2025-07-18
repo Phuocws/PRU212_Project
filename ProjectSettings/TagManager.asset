@@ -58,17 +58,20 @@ TagManager:
   - name: Hp
     uniqueID: 2672389385
     locked: 0
-  - name: Arrow
-    uniqueID: 4092407107
-    locked: 0
-  - name: UI
-    uniqueID: 967215281
+  - name: CommonUI
+    uniqueID: 4129790201
     locked: 0
   - name: Tower
     uniqueID: 1321628451
     locked: 0
   - name: Archer
     uniqueID: 1069729061
+    locked: 0
+  - name: Arrow
+    uniqueID: 4092407107
+    locked: 0
+  - name: UI
+    uniqueID: 967215281
     locked: 0
   m_RenderingLayers:
   - Default

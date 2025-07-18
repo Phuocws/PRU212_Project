@@ -77,10 +77,29 @@ public class Arrow : MonoBehaviour
 		{
 			if (target.TryGetComponent<BaseEnemy>(out var enemy))
 			{
-				enemy.TakeDamage(10);
-				if (bloodPrefab != null)
+				Vector3 effectOffset = GetEffectOffset();
+				if (Random.value <= tierData.accuracy)
 				{
-					GameObject blood = ObjectPool.Instance.SpawnFromPool("BloodEffect", target.transform.position, Quaternion.identity);
+					int rawDamage = Random.Range(tierData.minDamage, tierData.maxDamage + 1);
+					bool isCrit = Random.value <= tierData.critChance;
+					if (isCrit)
+					{
+						GameObject crit = ObjectPool.Instance.SpawnFromPool("CritEffect", target.transform.position + effectOffset, Quaternion.identity);
+						rawDamage = Mathf.RoundToInt(rawDamage * tierData.critMultiplier);
+					}
+					int finalDamage = Mathf.Max(1, rawDamage - enemy.armor);
+
+					enemy.TakeDamage(finalDamage);
+
+					if (bloodPrefab != null)
+					{
+						GameObject blood = ObjectPool.Instance.SpawnFromPool("BloodEffect", target.transform.position, Quaternion.identity);
+					}
+				}
+				else
+				{
+					GameObject miss = ObjectPool.Instance.SpawnFromPool("MissEffect", target.transform.position + effectOffset, Quaternion.identity);
+					// Blood effect is NOT spawned on miss
 				}
 			}
 			gameObject.SetActive(false);
@@ -137,12 +156,31 @@ public class Arrow : MonoBehaviour
 
 		if (!collision.TryGetComponent<BaseEnemy>(out var enemy)) return;
 
-		enemy.TakeDamage(tierData.damage);
-
-		if (bloodPrefab != null)
+		Vector3 effectOffset = GetEffectOffset();
+		if (Random.value <= tierData.accuracy)
 		{
-			GameObject blood = ObjectPool.Instance.SpawnFromPool("BloodEffect", target.transform.position, Quaternion.identity);
+			int rawDamage = Random.Range(tierData.minDamage, tierData.maxDamage + 1);
+			bool isCrit = Random.value <= tierData.critChance;
+			if (isCrit)
+			{
+				GameObject crit = ObjectPool.Instance.SpawnFromPool("CritEffect", target.transform.position + effectOffset, Quaternion.identity);
+				rawDamage = Mathf.RoundToInt(rawDamage * tierData.critMultiplier);
+			}
+			int finalDamage = Mathf.Max(1, rawDamage - enemy.armor);
+
+			enemy.TakeDamage(finalDamage);
+
+			if (bloodPrefab != null)
+			{
+				GameObject blood = ObjectPool.Instance.SpawnFromPool("BloodEffect", target.transform.position, Quaternion.identity);
+			}
 		}
+		else
+		{
+			GameObject miss = ObjectPool.Instance.SpawnFromPool("MissEffect", target.transform.position + effectOffset, Quaternion.identity);
+			// Blood effect is NOT spawned on miss
+		}
+
 		gameObject.SetActive(false);
 	}
 
@@ -178,5 +216,21 @@ public class Arrow : MonoBehaviour
 
 		bool isVertical = (angle > 45f && angle < 135f) || (angle > 225f && angle < 315f);
 		boxCollider.size = isVertical ? new Vector2(0.1f, 0.5f) : new Vector2(0.5f, 0.1f);
+	}
+
+	// Helper method to calculate effect offset based on arrow direction
+	private Vector3 GetEffectOffset()
+	{
+		// Use the direction from arrow to target
+		Vector2 direction = (target.transform.position - transform.position).normalized;
+		float horizontalOffset = 1f; // Adjust this value for more/less offset
+		Vector3 offset = Vector3.up * 0.5f; // Keep the vertical offset
+
+		if (direction.x > 0.1f)
+			offset += Vector3.right * horizontalOffset;
+		else if (direction.x < -0.1f)
+			offset += Vector3.left * horizontalOffset;
+
+		return offset;
 	}
 }

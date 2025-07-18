@@ -65,7 +65,7 @@ public class Archer : MonoBehaviour
 		towerRange = range;
 		towerCenter = center;
 
-		fireRate = archerTierData.shootSpeed;
+		fireRate = archerTierData.fireRate;
 
 		if (animController == null)
 			animController = GetComponent<ArcherAnimationController>();
@@ -126,9 +126,9 @@ public class Archer : MonoBehaviour
 		if (enemy.TryGetComponent<Collider2D>(out var col))
 		{
 			Vector2 closest = col.ClosestPoint(towerCenter.position);
-			return Vector2.Distance(towerCenter.position, closest) <= towerRange * 0.85f;
+			return Vector2.Distance(towerCenter.position, closest) <= towerRange * 0.95f;
 		}
-		return Vector2.Distance(towerCenter.position, enemy.transform.position) <= towerRange * 0.85f;
+		return Vector2.Distance(towerCenter.position, enemy.transform.position) <= towerRange * 0.95f;
 	}
 
 	private void PrepareToShoot()
@@ -260,7 +260,7 @@ public class Archer : MonoBehaviour
 		Gizmos.color = Color.green;
 		Gizmos.DrawWireSphere(towerCenter.position, towerRange);
 		Gizmos.color = Color.yellow;
-		Gizmos.DrawWireSphere(towerCenter.position, towerRange * 0.85f);
+		Gizmos.DrawWireSphere(towerCenter.position, towerRange * 0.95f);
 	}
 
 	public void ResetArcher()

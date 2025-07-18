@@ -35,7 +35,17 @@ public class TowerUIManager : MonoBehaviour
     [SerializeField] private GameObject towerParameters;
     [SerializeField] private TextMeshProUGUI TowerDamage;
 
-    private bool towerPanelJustOpened = false;
+	[Header("Tower Info Panel")]
+	[SerializeField] private GameObject towerInformationPanel;
+	[SerializeField] private Image avatarBackground;
+	[SerializeField] private Image avatarImage;
+	[SerializeField] private Image avatarBorder;
+	[SerializeField] private TextMeshProUGUI nameText;
+	[SerializeField] private TextMeshProUGUI attackValueText;
+	[SerializeField] private TextMeshProUGUI accuracyValueText;
+	[SerializeField] private TextMeshProUGUI fireRateValueText;
+
+	private bool towerPanelJustOpened = false;
     private float panelOpenGraceTime = 0.1f;
     private float panelOpenTimer = 0f;
     private Tower selectedTower;
@@ -53,6 +63,7 @@ public class TowerUIManager : MonoBehaviour
 
     private void Start()
     {
+        HideAllTowerPanels();
         archerTowerButton.onClick.AddListener(OnArcherTowerButtonClicked);
         upgradeButton.onClick.AddListener(OnUpgradeButtonClicked);
         sellButton.onClick.AddListener(OnSellButtonClicked);
@@ -94,7 +105,7 @@ public class TowerUIManager : MonoBehaviour
 
     public void CheckClickOutsideUI()
     {
-        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+		if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
         {
             if (!EventSystem.current.IsPointerOverGameObject())
             {
@@ -122,8 +133,8 @@ public class TowerUIManager : MonoBehaviour
         selectedTower = tower;
         selectedBuildType = null;
 
-        selectTowerPanel.SetActive(true);
-        priceText.text = $"{selectedTower.PreviewLevelData.cost}";
+		selectTowerPanel.SetActive(true);
+		priceText.text = $"{selectedTower.PreviewLevelData.cost}";
 
         buildCheckedIcon.SetActive(isChecked);
         buildUncheckedIcon.SetActive(isChecked);
@@ -196,9 +207,10 @@ public class TowerUIManager : MonoBehaviour
         sellIcon.SetActive(true);
 
         HideTowerDetails();
+		towerInformationPanel.SetActive(false);
     }
 
-    private void ShowTowerDetails(string title, string description, int? damage)
+    private void ShowTowerDetails(string title, string description, int? minDamage, int? maxDamge)
     {
         Vector2 uiPos = GameUIManager.Instance.WorldToUIPosition(selectedTower.transform.position + new Vector3(12, 0f, 0));
         RectTransform detailsRect = detailsPanel.GetComponent<RectTransform>();
@@ -209,10 +221,10 @@ public class TowerUIManager : MonoBehaviour
         towerTitle.text = title ?? "Unknown Tower";
         towerDescription.text = description ?? "No description available.";
 
-        if (damage.HasValue)
+        if (minDamage.HasValue && maxDamge.HasValue)
         {
             towerParameters.SetActive(true);
-            TowerDamage.text = $"{damage.Value}";
+            TowerDamage.text = $"{minDamage.Value}-{maxDamge.Value}";
         }
         else
             towerParameters.SetActive(false);
@@ -269,7 +281,8 @@ public class TowerUIManager : MonoBehaviour
 			ShowTowerDetails(
 				selectedTower.PreviewLevelData.displayName,
 				selectedTower.PreviewLevelData.description,
-				selectedTower.PreviewLevelData.arrowTier.damage
+				selectedTower.PreviewLevelData.arrowTier.minDamage,
+                selectedTower.PreviewLevelData.arrowTier.maxDamage
 			);
 
 			return;
@@ -315,7 +328,8 @@ public class TowerUIManager : MonoBehaviour
             ShowTowerDetails(
                 nextLevel.displayName,
                 nextLevel.description,
-                nextLevel.arrowTier.damage
+                nextLevel.arrowTier.minDamage,
+                nextLevel.arrowTier.maxDamage
             );
 
             selectedTower.ShowBothRange();
@@ -332,7 +346,6 @@ public class TowerUIManager : MonoBehaviour
 
         if (!GameManager.Instance.SpendCoins(cost))
         {
-            Debug.LogWarning("[TowerUIManager] Not enough coins to upgrade Tower.");
             return;
         }
 
@@ -361,7 +374,7 @@ public class TowerUIManager : MonoBehaviour
             ShowTowerDetails(
                 "Sell Tower",
                 $"Sell this tower and get for <color=yellow>{refund} coins</color>",
-                null
+                null, null
             );
 
             if (upgradeConfirmed)
@@ -381,5 +394,44 @@ public class TowerUIManager : MonoBehaviour
         sellCheckedIcon.SetActive(false);
         sellIcon.SetActive(true);
     }
+
+	public void ShowTowerInfoPanel(Tower tower)
+	{
+		if (tower == null || !tower.IsBuilt) return;
+
+		var currentLevel = tower.CurrentLevelData;
+
+		nameText.text = currentLevel.displayName;
+		attackValueText.text = $"{currentLevel.arrowTier.minDamage}-{currentLevel.arrowTier.maxDamage}";
+
+		// Fire Rate Label
+		float fireRate = currentLevel.archerTier.fireRate;
+		string fireRateLabel;
+		if (fireRate > 1f)
+			fireRateLabel = "Low";
+		else if (fireRate > 0.7f)
+			fireRateLabel = "Med";
+		else if (fireRate > 0.4f)
+			fireRateLabel = "Fast";
+		else
+			fireRateLabel = "High";
+		fireRateValueText.text = fireRateLabel;
+
+		// Accuracy Label
+		float accuracy = currentLevel.arrowTier.accuracy;
+		string accuracyLabel;
+		if (accuracy < 0.6f)
+			accuracyLabel = "Low";
+		else if (accuracy < 0.8f)
+			accuracyLabel = "Med";
+		else if (accuracy < 0.95f)
+			accuracyLabel = "High";
+		else
+			accuracyLabel = "Perfect";
+		accuracyValueText.text = accuracyLabel;
+
+		avatarImage.sprite = currentLevel.icon;
+		towerInformationPanel.SetActive(true);
+	}
 }
 

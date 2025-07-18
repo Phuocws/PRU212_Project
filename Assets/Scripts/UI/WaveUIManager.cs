@@ -61,11 +61,9 @@ public class WaveUIManager : MonoBehaviour
             if (!EventSystem.current.IsPointerOverGameObject())
             {
                 if (isWaveDetailShown)
+                {
                     HideWaveDetail();
-
-                // Hide tower panels if open
-                if (TowerUIManager.Instance != null)
-                    TowerUIManager.Instance.HideAllTowerPanels();
+                }
             }
         }
     }
@@ -98,12 +96,16 @@ public class WaveUIManager : MonoBehaviour
         // Hide all tower panels if open
         if (TowerUIManager.Instance != null)
             TowerUIManager.Instance.HideAllTowerPanels();
+
+        // Hide enemy info panel
+        if (GameUIManager.Instance != null)
+            GameUIManager.Instance.HideEnemyInfo();
     }
 
-    public void HideWaveDetail()
+	public void HideWaveDetail()
     {
         isWaveDetailShown = false;
-        waveDetailPanel.SetActive(false);
+        waveDetailPanel.SetActive(false);  
     }
 
     public void StartFirstWaveButton()

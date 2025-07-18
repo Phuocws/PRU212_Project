@@ -11,6 +11,15 @@ public class Tower : MonoBehaviour
 	[SerializeField] private GameObject currentRangeIndicator;
 	[SerializeField] private GameObject upgradeRangeIndicator;
 	public TowerLevelData PreviewLevelData => levelData != null && levelData.Count > 0 ? levelData[0] : null;
+	public TowerLevelData CurrentLevelData
+	{
+		get
+		{
+			if (currentLevel >= 0 && currentLevel < levelData.Count)
+				return levelData[currentLevel];
+			return null;
+		}
+	}
 
 	private GameObject currentVisual;
 	private Animator currentAnimator;
@@ -53,7 +62,10 @@ public class Tower : MonoBehaviour
 		if (hit != null && hit.gameObject == gameObject)
 		{
 			if (IsBuilt)
+			{
 				TowerUIManager.Instance.ShowSelectedTowerPanel(this);
+				TowerUIManager.Instance.ShowTowerInfoPanel(this);
+			}
 			else
 			{
 				TowerUIManager.Instance.ShowTowerBuildPanel(false, this);

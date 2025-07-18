@@ -13,10 +13,12 @@ MonoBehaviour:
   m_Name: Tower1
   m_EditorClassIdentifier: 
   towerVisualPrefab: {fileID: 9131571476301610310, guid: d784e8d4bce59ad4ea5d50c24d264133, type: 3}
-  displayName: Archer Tower 1
-  description: Archers ready to strike at your enemiese from a distance.
-  cost: 75
+  icon: {fileID: 21300000, guid: 66c0f3405d32005429036276f1ebe511, type: 3}
+  displayName: Basic Tower
+  description: Archers ready to strike at your enemies from a distance. A solid foundation
+    for your defense.
+  cost: 50
   archerCount: 1
-  range: 5
+  range: 5.5
   archerTier: {fileID: 11400000, guid: 4f09376d9c6c5f54897c3fe957f72e01, type: 2}
   arrowTier: {fileID: 11400000, guid: 278a7081e251ef34d84ab774da2fb645, type: 2}

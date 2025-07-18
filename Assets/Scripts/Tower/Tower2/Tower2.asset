@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: Tower2
   m_EditorClassIdentifier: 
   towerVisualPrefab: {fileID: 8341217654168697538, guid: 1023c872079a03148a1b86bcf02d7976, type: 3}
-  displayName: Archer Tower 2
-  description: Archer shoot broadhead arrows. Dealing more damage. thier longbows
-    have a longer attack range.
-  cost: 25
+  icon: {fileID: 21300000, guid: 66c0f3405d32005429036276f1ebe511, type: 3}
+  displayName: Swift Shot
+  description: Archers shoot faster and deadlier arrows. Their skill improves with
+    each battle.
+  cost: 80
   archerCount: 1
-  range: 6
+  range: 5.2
   archerTier: {fileID: 11400000, guid: ee08059d2a364254d8bab82dcdcdb4cc, type: 2}
   arrowTier: {fileID: 11400000, guid: b7ebaecf77f2d4749bddce31dd1ddd0e, type: 2}

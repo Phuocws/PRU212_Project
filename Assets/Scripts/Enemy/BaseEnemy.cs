@@ -5,7 +5,13 @@ using UnityEngine.UI;
 public abstract class BaseEnemy : MonoBehaviour
 {
 	[Header("Common Settings")]
-	[SerializeField] protected float maxHealth = 50f;
+	[SerializeField] public Sprite avatar;
+	public Sprite Avatar => avatar; // Public getter	
+	[SerializeField] public string typeName;
+	[SerializeField] public int minAttack;
+	[SerializeField] public int maxAttack;
+	[SerializeField] public int armor;
+	[SerializeField] public float maxHealth = 50f;
 	[SerializeField] protected Image healthValue;
 	[SerializeField] protected GameObject healthBar; // Health bar UI element
 	[SerializeField] public int damageAtEndOfPath = 1; // Damage to player base when enemy reaches the end

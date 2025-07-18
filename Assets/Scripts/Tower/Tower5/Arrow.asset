@@ -12,16 +12,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 305435402ca5cf5468dec18aa3ba4927, type: 3}
   m_Name: Arrow
   m_EditorClassIdentifier: 
-  damage: 30
-  speed: 40
+  speed: 7.5
+  accuracy: 0.9
   directionSprites:
-  - {fileID: 21300000, guid: f426e4eaf5888784bbe2a81c1cfa5ac4, type: 3}
-  - {fileID: 21300000, guid: e4fa1f4b7c37af44c88c91df4806fc28, type: 3}
-  - {fileID: 21300000, guid: c2eaba75e71a4044c9ca9990444515db, type: 3}
-  - {fileID: 21300000, guid: 5412c36205de2724e967ee89e851a976, type: 3}
-  - {fileID: 21300000, guid: 723d5767f52cfbb439cd95641d592064, type: 3}
-  - {fileID: 21300000, guid: e2506d11c8d7b744189a982aa90ae78c, type: 3}
-  - {fileID: 21300000, guid: 02ccf6088b09a1446bb29f064ad3cf0e, type: 3}
-  - {fileID: 21300000, guid: 3dd0e818a9eec944194838bb1794fa49, type: 3}
-  - {fileID: 21300000, guid: 089d87664d6a00c4c876e060aeed19c6, type: 3}
-  arrowPrefab: {fileID: 1246275874465676916, guid: bb58cba8ecbe33947b47667ea0c3acde, type: 3}
+  - {fileID: 21300000, guid: 7187a72cd83448a44816f24038b085a2, type: 3}
+  - {fileID: 21300000, guid: 97c2e2d3d750c8c4498a6dbd546b617e, type: 3}
+  - {fileID: 21300000, guid: 8ba212ad419d8d24c9a66fc27f8bc70a, type: 3}
+  - {fileID: 21300000, guid: 33b11d684359b5d489ca4071de515522, type: 3}
+  - {fileID: 21300000, guid: 0a8d7b54a1fb7314b94fe0201e795e4a, type: 3}
+  - {fileID: 21300000, guid: ba01b282328ad474092befc07f50a46d, type: 3}
+  - {fileID: 21300000, guid: a27c1ed341a43a64abd379b055cc0735, type: 3}
+  - {fileID: 21300000, guid: 391354186b096ff4da74b43b691fa6b5, type: 3}
+  - {fileID: 21300000, guid: f1fa7b963e92f2845ab7baf74375b9b8, type: 3}
+  - {fileID: 21300000, guid: dfebd30596dd8464f880e79c43844f3d, type: 3}
+  - {fileID: 21300000, guid: 1daa626b3b951be4ba5140b1c310fb3e, type: 3}
+  - {fileID: 21300000, guid: 20052fdfa0b04ad4da8903d51fd989f8, type: 3}
+  - {fileID: 21300000, guid: a78bdf58b31f43d41851ff4bad5bbbb7, type: 3}
+  arrowPrefab: {fileID: 630760976479286096, guid: 5ae8142e9d4ee154fb74ad0eba119127, type: 3}
+  minDamage: 10
+  maxDamage: 14
+  critChance: 0.2
+  critMultiplier: 2

@@ -4,6 +4,7 @@ using UnityEngine;
 public class TowerLevelData : ScriptableObject
 {
 	public GameObject towerVisualPrefab;
+	public Sprite icon;
 	public string displayName;
 	public string description;
 	public int cost;
