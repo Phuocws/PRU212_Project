@@ -174,6 +174,8 @@ public class Archer : MonoBehaviour
 		isPreparingToShoot = false;
 
 		animController.SetAction(ArcherAction.Attack);
+
+		AudioManager.Instance.PlaySound(AudioManager.Instance.shoot);
 		cooldownTimer = fireRate;
 	}
 

@@ -43,6 +43,7 @@ public class Slime : BaseEnemy
 
 		if (slimeType != SlimeType.Normal)
 		{
+			AudioManager.Instance.PlaySound(AudioManager.Instance.SlimeDeath);
 			base.Die();
 			return;
 		}
