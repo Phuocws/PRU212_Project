@@ -16,6 +16,7 @@ public abstract class BaseEnemy : MonoBehaviour
 	[SerializeField] protected GameObject healthBar; // Health bar UI element
 	[SerializeField] public int damageAtEndOfPath = 1; // Damage to player base when enemy reaches the end
 	[SerializeField] public int coinValue = 10; // Score awarded for defeating this enemy
+	[SerializeField] public GameObject currentEnemyIndicator;
 
 	public float currentHealth;
 	protected Animator animator;
@@ -51,6 +52,19 @@ public abstract class BaseEnemy : MonoBehaviour
 	protected virtual void Update()
 	{
 		HandleDirectionAnimation();
+
+		 // Show and update indicator only for the selected enemy
+		if (GameUIManager.Instance != null &&
+			GameUIManager.Instance.SelectedEnemy == this &&
+			GameUIManager.Instance.IsEnemyInfoPanelActive())
+		{
+			ShowIndicator();
+			UpdateIndicatorDirection();
+		}
+		else
+		{
+			HideIndicator();
+		}
 	}
 
 	protected void HandleDirectionAnimation()
@@ -142,6 +156,10 @@ public abstract class BaseEnemy : MonoBehaviour
 			StartCoroutine(DeactivateAfterDelay());
 
 		GameManager.Instance.AddCoins(coinValue);
+
+		// Hide enemy info panel if this enemy is currently selected
+		if (GameUIManager.Instance != null)
+			GameUIManager.Instance.HideEnemyInfoIfSelected(this);
 	}
 
 	private IEnumerator DeactivateAfterDelay()
@@ -166,5 +184,43 @@ public abstract class BaseEnemy : MonoBehaviour
 	{
 		if (healthValue != null)
 			healthValue.fillAmount = currentHealth / maxHealth;
+	}
+
+	public void ShowIndicator()
+	{
+		if (currentEnemyIndicator != null)
+		{
+			currentEnemyIndicator.SetActive(true);
+		}
+	}
+
+	public void HideIndicator()
+	{
+		if (currentEnemyIndicator != null)
+		{
+			currentEnemyIndicator.SetActive(false);
+		}
+	}
+
+	public void UpdateIndicatorDirection()
+	{
+		if (currentEnemyIndicator == null) return;
+
+		// Get movement direction from EnemyMovement or lastValidMoveDirection
+		Vector2 moveDir = Vector2.zero;
+		var movement = GetComponent<EnemyMovement>();
+		if (movement != null)
+		{
+			// If you have a public property for direction, use it
+			// Otherwise, use lastValidMoveDirection from BaseEnemy
+			moveDir = lastValidMoveDirection; // This should be updated each frame
+		}
+
+		if (moveDir == Vector2.zero)
+			moveDir = Vector2.up; // fallback
+
+		// Rotate indicator to match movement direction
+		float angle = Mathf.Atan2(moveDir.y, moveDir.x) * Mathf.Rad2Deg - 90f;
+		currentEnemyIndicator.transform.rotation = Quaternion.Euler(0, 0, angle);
 	}
 }

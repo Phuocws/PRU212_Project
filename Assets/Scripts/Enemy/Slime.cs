@@ -29,6 +29,10 @@ public class Slime : BaseEnemy
 
 	protected override void Die()
 	{
+		// Hide info for the dying slime if selected
+		if (GameUIManager.Instance != null)
+			GameUIManager.Instance.HideEnemyInfoIfSelected(this);
+
 		if (slimeType == SlimeType.Special && isSplitting && !hasSplit)
 		{
 			// Don't spawn clones
@@ -100,6 +104,7 @@ public class Slime : BaseEnemy
 		SpawnClone(transform.position + new Vector3(0.3f, 0), 0.15f);
 
 		gameObject.SetActive(false); // Disable AFTER clone spawn
+		GameUIManager.Instance?.HideEnemyInfoIfSelected(this); // Hide info if selected
 	}
 
 	private void SpawnClone(Vector3 pos, float yOffset)

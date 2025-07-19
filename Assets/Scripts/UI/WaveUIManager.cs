@@ -8,7 +8,7 @@ public class WaveUIManager : MonoBehaviour
 {
     public static WaveUIManager Instance { get; private set; }
 
-
+    [Header("Wave UI Elements")]
     [SerializeField] private GameObject startWaveButton;
     [SerializeField] private Image fillImage;
     [SerializeField] private GameObject waveDetailPanel;
@@ -16,6 +16,14 @@ public class WaveUIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI waveDetailsText;
     [SerializeField] private TextMeshProUGUI waveInstructionText;
     [SerializeField] private GameObject startBattlePanel;
+
+    [Header("Add Coin Panel")]
+    [SerializeField] private GameObject addCoinPanel;
+    [SerializeField] private TextMeshProUGUI addCoinText;
+    [SerializeField] private float coinPanelDisplayDuration = 2f;
+
+    private float coinPanelTimer;
+    private bool isShowingCoinPanel;
 
     private float countdownTime;
     private float timer;
@@ -51,6 +59,17 @@ public class WaveUIManager : MonoBehaviour
             }
         }
 
+        // Hide addCoinPanel after display duration
+        if (isShowingCoinPanel)
+        {
+            coinPanelTimer += Time.deltaTime;
+            if (coinPanelTimer >= coinPanelDisplayDuration)
+            {
+                addCoinPanel.SetActive(false);
+                isShowingCoinPanel = false;
+            }
+        }
+
         CheckClickOutsideUI();
     }
 
@@ -58,12 +77,9 @@ public class WaveUIManager : MonoBehaviour
     {
         if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
         {
-            if (!EventSystem.current.IsPointerOverGameObject())
+            if (!EventSystem.current.IsPointerOverGameObject() && isWaveDetailShown)
             {
-                if (isWaveDetailShown)
-                {
-                    HideWaveDetail();
-                }
+                HideWaveDetail();
             }
         }
     }
@@ -76,6 +92,23 @@ public class WaveUIManager : MonoBehaviour
         }
         else
         {
+            int coinsToAdd = 0;
+            if (isCounting && countdownTime > 0)
+            {
+                float remainingTime = Mathf.Max(0f, countdownTime - timer);
+                coinsToAdd = Mathf.FloorToInt(remainingTime); // 1 coin per second left
+
+                if (coinsToAdd > 0 && GameManager.Instance != null)
+                {
+                    GameManager.Instance.AddCoins(coinsToAdd);
+
+                    Vector2 coinUiPos = GameUIManager.Instance.WorldToUIPosition(startWaveButton.transform.position + new Vector3(31.11f, -2.035f, 0));
+                    ShowAddCoinPanel(coinsToAdd);
+
+                    ObjectPool.Instance.SpawnFromPool("CoinEffect", coinUiPos, Quaternion.identity);
+                }
+            }
+
             HideWaveDetail();
             startBattlePanel.SetActive(false);
             EnemySpawner.Instance.OnStartWaveClicked();
@@ -93,19 +126,17 @@ public class WaveUIManager : MonoBehaviour
         var wave = EnemySpawner.Instance.GetCurrentWave();
         waveDetailsText.text = wave != null ? wave.GetWaveSummary() : "???";
 
-        // Hide all tower panels if open
         if (TowerUIManager.Instance != null)
             TowerUIManager.Instance.HideAllTowerPanels();
 
-        // Hide enemy info panel
         if (GameUIManager.Instance != null)
             GameUIManager.Instance.HideEnemyInfo();
     }
 
-	public void HideWaveDetail()
+    public void HideWaveDetail()
     {
         isWaveDetailShown = false;
-        waveDetailPanel.SetActive(false);  
+        waveDetailPanel.SetActive(false);
     }
 
     public void StartFirstWaveButton()
@@ -134,5 +165,13 @@ public class WaveUIManager : MonoBehaviour
         fillImage.fillAmount = 0f;
         startWaveButton.SetActive(false);
         HideWaveDetail();
+    }
+
+    private void ShowAddCoinPanel(int coinAmount)
+    {
+        addCoinText.text = $"+ {coinAmount}";
+        addCoinPanel.SetActive(true);
+        isShowingCoinPanel = true;
+        coinPanelTimer = 0f;
     }
 }

@@ -22,6 +22,8 @@ public class GameUIManager : MonoBehaviour
 
 	private BaseEnemy selectedEnemy;
 
+    public BaseEnemy SelectedEnemy => selectedEnemy;
+
 	private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -57,6 +59,9 @@ public class GameUIManager : MonoBehaviour
 		enemyInfoPanel.SetActive(true);
 		selectedEnemy = enemy;
 
+		// Show indicator for selected enemy
+		selectedEnemy?.ShowIndicator();
+
 		nameText.text = enemy.typeName;
 		heartValue.text = $"{enemy.currentHealth}/{enemy.maxHealth}";
 
@@ -80,9 +85,21 @@ public class GameUIManager : MonoBehaviour
 
 	public void HideEnemyInfo()
 	{
+		// Hide indicator for previously selected enemy
+		if (selectedEnemy != null)
+			selectedEnemy.HideIndicator();
+
 		enemyInfoPanel.SetActive(false);
 		selectedEnemy = null;
 	}
 
 	public bool IsEnemyInfoPanelActive() => enemyInfoPanel.activeSelf;
+
+    public void HideEnemyInfoIfSelected(BaseEnemy enemy)
+    {
+        if (selectedEnemy == enemy)
+        {
+            HideEnemyInfo();
+        }
+    }
 }

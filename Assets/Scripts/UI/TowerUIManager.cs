@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 public class TowerUIManager : MonoBehaviour
 {
@@ -45,6 +46,12 @@ public class TowerUIManager : MonoBehaviour
 	[SerializeField] private TextMeshProUGUI accuracyValueText;
 	[SerializeField] private TextMeshProUGUI fireRateValueText;
 
+    [Header("Build Progress Bar")]
+	[SerializeField] private GameObject buildProgressPanel;
+	[SerializeField] private Image progressValueImage;
+	private Coroutine upgradeCoroutine;
+
+	private bool isProgressActive = false;
 	private bool towerPanelJustOpened = false;
     private float panelOpenGraceTime = 0.1f;
     private float panelOpenTimer = 0f;
@@ -124,6 +131,8 @@ public class TowerUIManager : MonoBehaviour
 
     public void ShowTowerBuildPanel(bool isChecked, Tower tower)
     {
+        if (isProgressActive) return; // Block selection during progress
+
         Vector2 uiPos = GameUIManager.Instance.WorldToUIPosition(tower.transform.position);
         RectTransform panelRect = selectTowerPanel.GetComponent<RectTransform>();
         panelRect.anchoredPosition = uiPos;
@@ -157,6 +166,8 @@ public class TowerUIManager : MonoBehaviour
 
     public void ShowSelectedTowerPanel(Tower tower)
     {
+        if (isProgressActive) return; // Block selection during progress
+
         Vector2 uiPos = GameUIManager.Instance.WorldToUIPosition(tower.transform.position);
         RectTransform panelRect = selectedTowerPanel.GetComponent<RectTransform>();
         panelRect.anchoredPosition = uiPos;
@@ -261,7 +272,11 @@ public class TowerUIManager : MonoBehaviour
                 return;
             }
 
-            selectedTower.Upgrade();
+			if (upgradeCoroutine != null)
+			    StopCoroutine(upgradeCoroutine);
+			upgradeCoroutine = StartCoroutine(ShowUpgradeProgress(1f, selectedTower));
+
+			selectedTower.Upgrade();
             HideAllTowerPanels();
             return;
         }
@@ -292,6 +307,12 @@ public class TowerUIManager : MonoBehaviour
 		{
 			return;
 		}
+
+
+		// Start upgrade bar
+		if (upgradeCoroutine != null)
+			StopCoroutine(upgradeCoroutine);
+		upgradeCoroutine = StartCoroutine(ShowUpgradeProgress(1f, selectedTower));
 
 		selectedTower.Upgrade();
         firstTowerBuilt = true;
@@ -349,6 +370,11 @@ public class TowerUIManager : MonoBehaviour
             return;
         }
 
+		// Start upgrade bar
+		if (upgradeCoroutine != null)
+			StopCoroutine(upgradeCoroutine);
+		upgradeCoroutine = StartCoroutine(ShowUpgradeProgress(1f, selectedTower));
+
         selectedTower.Upgrade();
         HideAllTowerPanels();
 
@@ -397,7 +423,7 @@ public class TowerUIManager : MonoBehaviour
 
 	public void ShowTowerInfoPanel(Tower tower)
 	{
-		if (tower == null || !tower.IsBuilt) return;
+		if (tower == null || !tower.IsBuilt || isProgressActive) return;
 
 		var currentLevel = tower.CurrentLevelData;
 
@@ -432,6 +458,33 @@ public class TowerUIManager : MonoBehaviour
 
 		avatarImage.sprite = currentLevel.icon;
 		towerInformationPanel.SetActive(true);
+	}
+
+	private IEnumerator ShowUpgradeProgress(float duration, Tower tower)
+	{
+        isProgressActive = true; // Block clicks
+
+        // Calculate UI position from tower
+        Vector2 getPos = GameUIManager.Instance.WorldToUIPosition(tower.transform.position);
+		getPos.y += 130f;
+		RectTransform panelRect = buildProgressPanel.GetComponent<RectTransform>();
+        panelRect.anchoredPosition = getPos;
+
+        buildProgressPanel.SetActive(true);
+        float time = 0f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            float percent = time / duration;
+
+            progressValueImage.fillAmount = percent;
+
+            yield return null;
+        }
+
+        buildProgressPanel.SetActive(false);
+        isProgressActive = false; // Allow clicks again
 	}
 }
 

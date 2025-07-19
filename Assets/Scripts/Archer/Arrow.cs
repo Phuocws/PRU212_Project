@@ -84,7 +84,27 @@ public class Arrow : MonoBehaviour
 					bool isCrit = Random.value <= tierData.critChance;
 					if (isCrit)
 					{
-						GameObject crit = ObjectPool.Instance.SpawnFromPool("CritEffect", target.transform.position + effectOffset, Quaternion.identity);
+						Vector3 critPos = target.transform.position + effectOffset;
+
+						// If attacking from the left, move effect slightly to the left
+						if ((target.transform.position - transform.position).x < 0f)
+						{
+							critPos.x -= 0.3f; // Adjust this value for desired offset
+						}
+						else
+						{
+							critPos.x += 0.3f; // Optional: keep symmetry for right side
+						}
+
+						GameObject crit = ObjectPool.Instance.SpawnFromPool("CritEffect", critPos, Quaternion.identity);
+
+						// Flip the X scale of the effect if attacking from the left
+						Vector3 scale = crit.transform.localScale;
+						scale.x = ((target.transform.position - transform.position).x < 0f)
+							? -Mathf.Abs(scale.x)
+							: Mathf.Abs(scale.x);
+						crit.transform.localScale = scale;
+
 						rawDamage = Mathf.RoundToInt(rawDamage * tierData.critMultiplier);
 					}
 					int finalDamage = Mathf.Max(1, rawDamage - enemy.armor);
@@ -163,7 +183,27 @@ public class Arrow : MonoBehaviour
 			bool isCrit = Random.value <= tierData.critChance;
 			if (isCrit)
 			{
-				GameObject crit = ObjectPool.Instance.SpawnFromPool("CritEffect", target.transform.position + effectOffset, Quaternion.identity);
+				Vector3 critPos = target.transform.position + effectOffset;
+
+				// If attacking from the left, move effect slightly to the left
+				if ((target.transform.position - transform.position).x < 0f)
+				{
+					critPos.x -= 0.3f; // Adjust this value for desired offset
+				}
+				else
+				{
+					critPos.x += 0.3f; // Optional: keep symmetry for right side
+				}
+
+				GameObject crit = ObjectPool.Instance.SpawnFromPool("CritEffect", critPos, Quaternion.identity);
+
+				// Flip the X scale of the effect if attacking from the left
+				Vector3 scale = crit.transform.localScale;
+				scale.x = ((target.transform.position - transform.position).x < 0f)
+					? -Mathf.Abs(scale.x)
+					: Mathf.Abs(scale.x);
+				crit.transform.localScale = scale;
+
 				rawDamage = Mathf.RoundToInt(rawDamage * tierData.critMultiplier);
 			}
 			int finalDamage = Mathf.Max(1, rawDamage - enemy.armor);

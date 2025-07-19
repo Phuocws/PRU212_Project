@@ -255,14 +255,6 @@ public class Archer : MonoBehaviour
 		animController.SetAction(ArcherAction.Idle);
 	}
 
-	private void OnDrawGizmosSelected()
-	{
-		Gizmos.color = Color.green;
-		Gizmos.DrawWireSphere(towerCenter.position, towerRange);
-		Gizmos.color = Color.yellow;
-		Gizmos.DrawWireSphere(towerCenter.position, towerRange * 0.95f);
-	}
-
 	public void ResetArcher()
 	{
 		CancelInvoke();
