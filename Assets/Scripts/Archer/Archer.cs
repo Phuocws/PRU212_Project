@@ -122,13 +122,10 @@ public class Archer : MonoBehaviour
 	private bool IsInTowerRange(BaseEnemy enemy)
 	{
 		if (enemy == null) return false;
-
-		if (enemy.TryGetComponent<Collider2D>(out var col))
-		{
-			Vector2 closest = col.ClosestPoint(towerCenter.position);
-			return Vector2.Distance(towerCenter.position, closest) <= towerRange * 0.95f;
-		}
-		return Vector2.Distance(towerCenter.position, enemy.transform.position) <= towerRange * 0.95f;
+		Vector2 center = towerCenter.position;
+		float range = towerRange * 0.95f;
+		Vector2 enemyPos = enemy.transform.position;
+		return Vector2.Distance(center, enemyPos) <= range;
 	}
 
 	private void PrepareToShoot()
@@ -222,7 +219,7 @@ public class Archer : MonoBehaviour
 
 		foreach (var hit in hits)
 		{
-			if (hit.TryGetComponent(out BaseEnemy enemy) && IsValidTarget(enemy))
+			if (hit.TryGetComponent(out BaseEnemy enemy) && IsValidTarget(enemy) && IsInTowerRange(enemy))
 				valid.Add(enemy);
 		}
 

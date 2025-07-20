@@ -10,7 +10,7 @@ public class MainMenu : MonoBehaviour
 
 	public void Start()
 	{
-		Time.timeScale = 1f; // Ensure time scale is reset when entering the main menu
+		Time.timeScale = 1f;
 	}
 
 	public void ShowAboutMenu()

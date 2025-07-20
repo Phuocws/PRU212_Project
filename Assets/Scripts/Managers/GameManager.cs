@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -77,7 +78,7 @@ public class GameManager : MonoBehaviour
 
 		if (CurrentHearts <= 0)
 		{
-			Defeat();
+			DefeatDelayed(1);
 		}
 	}
 
@@ -105,5 +106,33 @@ public class GameManager : MonoBehaviour
 			if (background != null) background.SetActive(true);
 			winPanel.SetActive(true);
 		}
+	}
+
+	public void VictoryDelayed(float delaySeconds)
+	{
+		StartCoroutine(VictoryDelayCoroutine(delaySeconds));
+	}
+
+	private IEnumerator VictoryDelayCoroutine(float delaySeconds)
+	{
+		yield return new WaitForSeconds(delaySeconds);
+		Victory();
+	}
+
+	public void DefeatDelayed(float delaySeconds)
+	{
+		var allEnemies = FindObjectsByType<EnemyMovement>(FindObjectsSortMode.None);
+		foreach (var enemy in allEnemies)
+		{
+			enemy.enabled = false; 
+		}
+
+		StartCoroutine(DefeatDelayCoroutine(delaySeconds));
+	}
+
+	private IEnumerator DefeatDelayCoroutine(float delaySeconds)
+	{
+		yield return new WaitForSeconds(delaySeconds);
+		Defeat();
 	}
 }
