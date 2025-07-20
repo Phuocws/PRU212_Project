@@ -10,8 +10,7 @@ public class Slime : BaseEnemy
 	[SerializeField] private string cloneSlimeTag = "CloneSlime";
 
 	private int splitWaypointIndex;
-	private bool hasSplit = false;
-	private bool isSplitting = false;
+	private bool stopSplit = false;
 
 	protected override void Awake()
 	{
@@ -29,26 +28,23 @@ public class Slime : BaseEnemy
 
 	protected override void Die()
 	{
-		// Hide info for the dying slime if selected
 		if (GameUIManager.Instance != null)
 			GameUIManager.Instance.HideEnemyInfoIfSelected(this);
 
-		if (slimeType == SlimeType.Special && isSplitting && !hasSplit)
+		if (slimeType == SlimeType.Special)
 		{
-			// Don't spawn clones
-			isSplitting = false;
-			hasSplit = true; // Mark it to prevent double trigger
-		}
-
-
-		if (slimeType != SlimeType.Normal)
-		{
-			AudioManager.Instance.PlaySound(AudioManager.Instance.SlimeDeath);
-			base.Die();
+			stopSplit = true;
+			base.Die(); 
 			return;
 		}
 
-		if (Random.value < specialSlimeSpawnChance)
+		if (slimeType == SlimeType.Clone)
+		{
+			base.Die(); 
+			return;
+		}
+
+		if (slimeType == SlimeType.Normal && Random.value < specialSlimeSpawnChance)
 		{
 			Vector3 spawnPos = transform.position;
 			Vector2 direction = moveDirection;
@@ -63,14 +59,16 @@ public class Slime : BaseEnemy
 			if (special != null && special.TryGetComponent<Slime>(out var specialSlime))
 			{
 				specialSlime.ResetEnemy();
-
 				specialSlime.slimeType = SlimeType.Special;
+				EnemyTracker.Instance.RegisterEnemy();
 				specialSlime.StartSplit(direction, pathIndex);
 			}
+
+			base.Die(); 
 		}
 		else
 		{
-			base.Die();
+			base.Die(); 
 		}
 	}
 
@@ -78,34 +76,26 @@ public class Slime : BaseEnemy
 	{
 		moveDirection = inheritedDirection;
 		splitWaypointIndex = pathIndex;
-		hasSplit = false;
-		isSplitting = true;
+		stopSplit = false;
 
 		animator.SetFloat("MoveX", moveDirection.x);
 		animator.SetFloat("MoveY", moveDirection.y);
 		animator.SetTrigger("Split");
-
-		DisableColliders();
 	}
 
-	// Animation event should call this at the END of the Split animation
 	public void OnSplitAnimationComplete()
 	{
-		//if (hasSplit) return;
-		if (hasSplit || currentHealth <= 0f)
+		if (stopSplit)
 		{
-			isSplitting = false;
-			return; // Already dead or split done
+			return;
 		}
-
-		hasSplit = true;
-		isSplitting = false;
 
 		SpawnClone(transform.position + new Vector3(-0.3f, 0), -0.15f);
 		SpawnClone(transform.position + new Vector3(0.3f, 0), 0.15f);
 
-		gameObject.SetActive(false); // Disable AFTER clone spawn
-		GameUIManager.Instance?.HideEnemyInfoIfSelected(this); // Hide info if selected
+		EnemyTracker.Instance.UnregisterEnemy();
+		gameObject.SetActive(false);
+		GameUIManager.Instance?.HideEnemyInfoIfSelected(this);
 	}
 
 	private void SpawnClone(Vector3 pos, float yOffset)
@@ -115,6 +105,7 @@ public class Slime : BaseEnemy
 		{
 			slime.slimeType = SlimeType.Clone;
 			slime.ResetEnemy();
+			EnemyTracker.Instance.RegisterEnemy();
 			float healthPercent = currentHealth / maxHealth;
 			slime.currentHealth = slime.maxHealth * healthPercent;
 			slime.UpdateHealthBar();
@@ -123,7 +114,7 @@ public class Slime : BaseEnemy
 			{
 				movement.SetSnapToFirstWaypoint(false);
 				movement.SetPathOffset(new Vector2(0f, yOffset), false);
-				movement.InitializePosition(); // Keeps current position
+				movement.InitializePosition();
 				movement.SetWaypointIndex(splitWaypointIndex);
 			}
 		}
@@ -132,8 +123,8 @@ public class Slime : BaseEnemy
 	public override void ResetEnemy()
 	{
 		base.ResetEnemy();
-		isSplitting = false;
-		hasSplit = false;
+		stopSplit = false;
 		GetComponent<EnemyMovement>().enabled = (slimeType != SlimeType.Special);
+		EnableColliders(); 
 	}
 }

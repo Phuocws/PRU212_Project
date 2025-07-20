@@ -4,24 +4,35 @@ using UnityEngine.SceneManagement;
 public class PauseGame : MonoBehaviour
 {
     public GameObject pauseMenu;
+    private const string MainMenuSceneName = "MainMenu";
 
-    public void pauseGame()
+    public void Pause()
     {
-        pauseMenu.SetActive(true);
-	}
-	public void resumeGame()
-    {
-		pauseMenu.SetActive(false);
-	}
-	public void replayGame()
-	{
-		SceneManager.LoadScene(0);
-		pauseMenu.SetActive(false);
-	}
+        GameManager.Instance.background.SetActive(true);
+		pauseMenu.SetActive(true);
+        Time.timeScale = 0f;
+    }
 
-	public void backToMenu()
+    public void Resume()
     {
-        SceneManager.LoadScene(0);
+        GameManager.Instance.background.SetActive(false);
+		pauseMenu.SetActive(false);
+        Time.timeScale = 1f;
+    }
+
+    public void Replay()
+    {
+        GameManager.Instance.background.SetActive(false);
+		Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         pauseMenu.SetActive(false);
-	}
+    }
+
+    public void BackToMenu()
+    {
+        GameManager.Instance.background.SetActive(false);
+		Time.timeScale = 0f;
+        pauseMenu.SetActive(false);
+        SceneManager.LoadScene(MainMenuSceneName);
+    }
 }

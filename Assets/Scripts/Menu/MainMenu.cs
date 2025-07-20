@@ -1,29 +1,37 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class Mainenu : MonoBehaviour
+public class MainMenu : MonoBehaviour
 {
     public GameObject mainMenu;
     public GameObject aboutMenu;
-	
 
-    public void aboutMenuFunction()
-    {
-        aboutMenu.SetActive(true);
+    private const string MapSceneName = "Map";
+
+	public void Start()
+	{
+		Time.timeScale = 1f; // Ensure time scale is reset when entering the main menu
 	}
-    public void mainMenuFunction()
+
+	public void ShowAboutMenu()
+    {
+        mainMenu.SetActive(false);
+        aboutMenu.SetActive(true);
+    }
+
+    public void ShowMainMenu()
     {
         aboutMenu.SetActive(false);
         mainMenu.SetActive(true);
-	}
+    }
 
-    public void startGame()
+    public void StartGame()
     {
-        SceneManager.LoadScene(1);
-	}
+        SceneManager.LoadScene(MapSceneName);
+    }
 
-    public void quitGame()
+    public void QuitGame()
     {
         Application.Quit();
-	}
+    }
 }

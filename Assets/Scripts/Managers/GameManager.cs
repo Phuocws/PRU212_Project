@@ -8,6 +8,11 @@ public class GameManager : MonoBehaviour
 	[SerializeField] private int startingHearts = 20;
 	[SerializeField] private int startingCoins = 100;
 
+	[Header("Game Over Panels")]
+	[SerializeField] public GameObject background;
+	[SerializeField] private GameObject winPanel;
+	[SerializeField] private GameObject losePanel;
+
 	private bool isGameOver = false;
 	public bool IsGameOver => isGameOver;
 
@@ -24,7 +29,6 @@ public class GameManager : MonoBehaviour
 		{
 			Destroy(gameObject);
 		}
-		DontDestroyOnLoad(gameObject);
 	}
 
 	private void Start()
@@ -34,6 +38,7 @@ public class GameManager : MonoBehaviour
 
 	private void InitGame()
 	{
+		Time.timeScale = 1f; // Ensure time scale is reset at game start
 		CurrentHearts = startingHearts;
 		CurrentCoints = startingCoins;
 
@@ -41,6 +46,11 @@ public class GameManager : MonoBehaviour
 
 		GameUIManager.Instance.SetHearts(CurrentHearts);
 		GameUIManager.Instance.SetCoins(CurrentCoints);
+
+		// Hide panels at game start
+		if (background != null) background.SetActive(false);
+		if (winPanel != null) winPanel.SetActive(false);
+		if (losePanel != null) losePanel.SetActive(false);
 	}
 
 	public void AddCoins(int amount)
@@ -76,16 +86,24 @@ public class GameManager : MonoBehaviour
 		if (isGameOver) return;
 
 		isGameOver = true;
-		Debug.Log("[GameManager] GAME OVER - YOU LOST");
-		// TODO: Show defeat UI
+		if (losePanel != null)
+		{
+			if (background != null) background.SetActive(true);
+			losePanel.SetActive(true);
+			Time.timeScale = 0f; // Pause the game when defeated
+		}
 	}
 
 	public void Victory()
 	{
 		if (isGameOver) return;
-
+					
 		isGameOver = true;
-		Debug.Log("[GameManager] GAME OVER - YOU WON");
-		// TODO: Show win UI
+		if (winPanel != null)
+		{
+			Time.timeScale = 0f; // Pause the game when victorious
+			if (background != null) background.SetActive(true);
+			winPanel.SetActive(true);
+		}
 	}
 }

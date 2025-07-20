@@ -11,19 +11,18 @@ public class EnemyTracker : MonoBehaviour
 	{
 		if (Instance == null) Instance = this;
 		else { Destroy(gameObject); return; }
-
-		DontDestroyOnLoad(gameObject);
 	}
 
 	public void RegisterEnemy()
 	{
 		aliveEnemies++;
+		Debug.Log("Enemy registered. Total alive: " + aliveEnemies);
 	}
 
 	public void UnregisterEnemy()
 	{
 		aliveEnemies--;
-
+		Debug.Log("Enemy unregistered. Total alive: " + aliveEnemies);
 		TryWinCheck();
 	}
 
@@ -39,6 +38,7 @@ public class EnemyTracker : MonoBehaviour
 
 		if (allWavesCompleted && aliveEnemies <= 0)
 		{
+			Debug.Log(aliveEnemies);
 			GameManager.Instance.Victory();
 		}
 	}
