@@ -15,10 +15,10 @@ MonoBehaviour:
   towerVisualPrefab: {fileID: 6630193724433970037, guid: 0494dac6d1547714a9adc91aaab0cfc7, type: 3}
   icon: {fileID: 21300000, guid: 66c0f3405d32005429036276f1ebe511, type: 3}
   displayName: Elite Tower
-  description: Veteran archers work in perfect sync. More arrows, better damage,
-    and unwavering focus. Great against dense enemy waves.
+  description: "Veteran archers sync perfectly\u2014more arrows, better damage, ideal
+    for tight waves."
   cost: 180
   archerCount: 3
-  range: 6.5
+  range: 7
   archerTier: {fileID: 11400000, guid: 9d725c1a9a4cb4e488dfd8ce6c89b6a3, type: 2}
   arrowTier: {fileID: 11400000, guid: 28372f73390413848b2d98d9798c5403, type: 2}

@@ -15,27 +15,23 @@ public class MainMenu : MonoBehaviour
 
 	public void ShowAboutMenu()
     {
-        AudioManager.Instance.PlayButtonClickSound();
 		mainMenu.SetActive(false);
         aboutMenu.SetActive(true);
     }
 
     public void ShowMainMenu()
     {
-        AudioManager.Instance.PlayButtonClickSound();
 		aboutMenu.SetActive(false);
         mainMenu.SetActive(true);
     }
 
     public void StartGame()
     {
-        AudioManager.Instance.PlayButtonClickSound();
 		SceneManager.LoadScene(MapSceneName);
     }
 
     public void QuitGame()
     {
-        AudioManager.Instance.PlayButtonClickSound();
 		Application.Quit();
     }
 }

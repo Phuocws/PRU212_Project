@@ -15,10 +15,10 @@ MonoBehaviour:
   towerVisualPrefab: {fileID: 9028222377795691804, guid: a8423b78248cf8a48a1b759b5b7187ef, type: 3}
   icon: {fileID: 21300000, guid: 66c0f3405d32005429036276f1ebe511, type: 3}
   displayName: Ranger Base
-  description: Skilled rangers with improved arrows now operate the tower. Stronger
-    volleys and improved range make this a serious mid-game threat.
+  description: Skilled rangers fire stronger, farther volleys. A serious mid-game
+    threat.
   cost: 140
   archerCount: 2
-  range: 6.3
+  range: 6.8
   archerTier: {fileID: 11400000, guid: be9385f2e11ad5b41859603bec826cbd, type: 2}
   arrowTier: {fileID: 11400000, guid: 3bdc83097590e224980d6ad0ecd2dfb8, type: 2}

@@ -169,13 +169,13 @@ public class Tower : MonoBehaviour
 			{
 				archer.Initialize(data.archerTier, data.arrowTier, data.range, transform);
 				archerList.Add(archer);
-				AudioManager.Instance.PlayRandomArcherVoice();
 			}
 			else
 			{
 				Debug.LogError($"[Tower] Archer missing script: {archerTag}");
 			}
 		}
+		AudioManager.Instance.PlayRandomArcherVoice();
 	}
 
 	private void DespawnAllArchers()
