@@ -57,7 +57,7 @@ public class EnemySpawner : MonoBehaviour
 		if (startWaveButton != null)
 		{
 			startWaveButton.SetActive(true);
-			EnemyTracker.Instance.ResetTracker(); // Reset enemy tracker
+			EnemyTracker.Instance.ResetTracker(); 
 			waveUIManager.StartFirstWaveButton();
 			gameUIManager.SetWaves(currentWaveIndex, waves.Length);
 		}
@@ -104,6 +104,11 @@ public class EnemySpawner : MonoBehaviour
 				return false;
 
 			currentType = wave.enemies[enemyTypeIndex];
+
+			if (currentType.enemyTag == "Wolf")
+			{
+				AudioManager.Instance.PlaySound(AudioManager.Instance.wolf);
+			}
 		}
 
 		SpawnEnemy(currentType.enemyTag);
@@ -153,6 +158,13 @@ public class EnemySpawner : MonoBehaviour
 
 		enemyTypeIndex = 0;
 		spawnedOfCurrentType = 0;
+
+		if (currentWaveIndex == 0)
+		{
+			AudioManager.Instance.StopSound(AudioManager.Instance.onGame);
+			AudioManager.Instance.PlaySound(AudioManager.Instance.inGame);
+			AudioManager.Instance.PlaySound(AudioManager.Instance.startFirstWave);
+		}
 
 		gameUIManager.SetWaves(currentWaveIndex + 1, waves.Length);
 	}

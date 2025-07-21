@@ -17,6 +17,9 @@ public class GameManager : MonoBehaviour
 	private bool isGameOver = false;
 	public bool IsGameOver => isGameOver;
 
+	public static bool IsGamePaused { get; private set; }
+
+
 	public int CurrentHearts { get; private set; }
 	public int CurrentCoints { get; private set; }
 
@@ -39,7 +42,7 @@ public class GameManager : MonoBehaviour
 
 	private void InitGame()
 	{
-		Time.timeScale = 1f; // Ensure time scale is reset at game start
+		Time.timeScale = 1f; 
 		CurrentHearts = startingHearts;
 		CurrentCoints = startingCoins;
 
@@ -78,6 +81,7 @@ public class GameManager : MonoBehaviour
 
 		if (CurrentHearts <= 0)
 		{
+			AudioManager.Instance.PlaySound(AudioManager.Instance.defeat);	
 			DefeatDelayed(1);
 		}
 	}
@@ -91,7 +95,7 @@ public class GameManager : MonoBehaviour
 		{
 			if (background != null) background.SetActive(true);
 			losePanel.SetActive(true);
-			Time.timeScale = 0f; // Pause the game when defeated
+			Time.timeScale = 0f; 
 		}
 	}
 
@@ -102,7 +106,7 @@ public class GameManager : MonoBehaviour
 		isGameOver = true;
 		if (winPanel != null)
 		{
-			Time.timeScale = 0f; // Pause the game when victorious
+			Time.timeScale = 0f;
 			if (background != null) background.SetActive(true);
 			winPanel.SetActive(true);
 		}
@@ -134,5 +138,9 @@ public class GameManager : MonoBehaviour
 	{
 		yield return new WaitForSeconds(delaySeconds);
 		Defeat();
+	}
+	public void SetPauseState(bool isPaused)
+	{
+		IsGamePaused = isPaused;
 	}
 }

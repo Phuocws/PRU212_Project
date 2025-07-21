@@ -36,6 +36,7 @@ public class EnemyTracker : MonoBehaviour
 
 		if (allWavesCompleted && aliveEnemies <= 0)
 		{
+			AudioManager.Instance.PlaySound(AudioManager.Instance.victory);
 			GameManager.Instance.VictoryDelayed(1);
 		}
 	}
