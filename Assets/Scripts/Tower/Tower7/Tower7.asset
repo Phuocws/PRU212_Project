@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   towerVisualPrefab: {fileID: 7059018334846222527, guid: 116091f191d533045967864af69a4eb6, type: 3}
   icon: {fileID: 21300000, guid: 66c0f3405d32005429036276f1ebe511, type: 3}
-  displayName: Arrow Fortress
-  description: The peak of archer engineering. Three elite archers fire enchanted
-    arrows with lethal force and unmatched speed.
-  cost: 400
+  displayName: "King\u2019s Keep"
+  description: The pinnacle of ranged might. Four master archers rain down high-tier
+    arrows with devastating effects. Your final stand begins here.
+  cost: 300
   archerCount: 3
-  range: 6.5
+  range: 7
   archerTier: {fileID: 11400000, guid: 97f5fdbe612e97b449682ec85127614c, type: 2}
   arrowTier: {fileID: 11400000, guid: bdba0e5b1a6b1af40844894d9f916dda, type: 2}
