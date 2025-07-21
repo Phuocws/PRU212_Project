@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class Orc : BaseEnemy
 {
 	protected override void Awake()
@@ -17,7 +19,10 @@ public class Orc : BaseEnemy
 
 	protected override void Die()
 	{
-		AudioManager.Instance.PlaySound(AudioManager.Instance.orcDeath);
+		// Randomly choose between orcDeath and oof
+		AudioSource[] deathSounds = { AudioManager.Instance.orcDeath, AudioManager.Instance.oof };
+		int randomIndex = UnityEngine.Random.Range(0, deathSounds.Length);
+		AudioManager.Instance.PlaySound(deathSounds[randomIndex]);
 		base.Die();
 	}
 }

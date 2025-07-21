@@ -116,7 +116,7 @@ public class AudioManager : MonoBehaviour
 
 		// List all that might be playing during gameplay
 		AudioSource[] toPause = {
-		inGame, onGame, flying, wolfMoving, orcMoving, slimeMoving
+		inGame, onGame, flying, wolfMoving, orcMoving, slimeMoving, wolf, hawk, slimeDeath, beeDeath, wolfDeath, orcDeath, oof, startFirstWave
 	};
 
 		foreach (var audio in toPause)

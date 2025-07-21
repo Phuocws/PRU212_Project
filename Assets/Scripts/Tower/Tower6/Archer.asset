@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3062dbab55e99944a55ce7d52081a51, type: 3}
   m_Name: Archer
   m_EditorClassIdentifier: 
-  fireRate: 1
+  fireRate: 0.75
   arrowsPerShoot: 2
   archerPrefab: {fileID: 6408980873810659048, guid: 06edb761a264d0f4e973e4029b576421, type: 3}
   tier: 3

@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   towerVisualPrefab: {fileID: 9131571476301610310, guid: d784e8d4bce59ad4ea5d50c24d264133, type: 3}
   icon: {fileID: 21300000, guid: 66c0f3405d32005429036276f1ebe511, type: 3}
-  displayName: Basic Tower
-  description: Archers ready to strike at your enemies from a distance. A solid foundation
-    for your defense.
+  displayName: Wood Watch
+  description: A basic lookout post with a lone archer on duty. Archers ready to
+    strike at your enemies from a distance. A solid foundation for your defense.
   cost: 50
   archerCount: 1
   range: 5.5
