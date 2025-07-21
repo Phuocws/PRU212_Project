@@ -15,10 +15,10 @@ MonoBehaviour:
   towerVisualPrefab: {fileID: 4380929142909539572, guid: f6d476af0ebbf6944b190f102187d0f9, type: 3}
   icon: {fileID: 21300000, guid: 66c0f3405d32005429036276f1ebe511, type: 3}
   displayName: Heroic Stand
-  description: Nearing legendary status, this tower combines precision and speed.
-    Tier 3 archers with elite training deliver deadly shots efficiently.
+  description: Near-legendary precision and speed. Tier 3 archers strike fast and
+    hard.
   cost: 240
   archerCount: 3
-  range: 6.7
+  range: 7.2
   archerTier: {fileID: 11400000, guid: 3912f73ab25f0974db41596d966a9e48, type: 2}
   arrowTier: {fileID: 11400000, guid: 28181c7d6e51e02499ef6478e2f4474c, type: 2}

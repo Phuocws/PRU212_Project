@@ -145,7 +145,7 @@ public class TowerUIManager : MonoBehaviour
 		priceText.text = $"{selectedTower.PreviewLevelData.cost}";
 
         buildCheckedIcon.SetActive(isChecked);
-        buildUncheckedIcon.SetActive(isChecked);
+		buildUncheckedIcon.SetActive(isChecked);
         towerIcon.SetActive(!isChecked);
 
         buildTowerPanel.SetActive(false);
@@ -178,7 +178,8 @@ public class TowerUIManager : MonoBehaviour
         selectedTower.ShowRange();
 
         upgradeConfirmed = false;
-        upgradeCheckedIcon.SetActive(false);
+        upgradeUncheckedIcon.SetActive(false);
+		upgradeCheckedIcon.SetActive(false);
         upgradeIcon.SetActive(true);
 
         bool canUpgrade = tower.CanUpgrade;
@@ -458,7 +459,7 @@ public class TowerUIManager : MonoBehaviour
 		else if (accuracy < 0.95f)
 			accuracyLabel = "High";
 		else
-			accuracyLabel = "Perfect";
+			accuracyLabel = "Perf";
 		accuracyValueText.text = accuracyLabel;
 
 		avatarImage.sprite = currentLevel.icon;

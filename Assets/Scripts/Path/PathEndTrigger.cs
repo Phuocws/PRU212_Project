@@ -9,6 +9,10 @@ public class PathEndTrigger : MonoBehaviour
 		{
 			GameManager.Instance.TakeDamage(enemy.damageAtEndOfPath);
 			enemy.gameObject.SetActive(false);
+			AudioManager.Instance.PlaySound(AudioManager.Instance.oof);
+			if (GameUIManager.Instance != null)
+				GameUIManager.Instance.HideEnemyInfoIfSelected(enemy);
+			GameManager.Instance.AddCoins(enemy.coinValue);
 			EnemyTracker.Instance.UnregisterEnemy();
 		}
 	}

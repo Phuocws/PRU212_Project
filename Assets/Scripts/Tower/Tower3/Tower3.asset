@@ -15,10 +15,9 @@ MonoBehaviour:
   towerVisualPrefab: {fileID: 7905720530323522018, guid: 59a9fd7e482972e499ab39717247a455, type: 3}
   icon: {fileID: 21300000, guid: 66c0f3405d32005429036276f1ebe511, type: 3}
   displayName: Guard Tower
-  description: Reinforced structure and additional firepower. Two archers take aim
-    with faster shots. Enemies now think twice before approaching.
+  description: "Reinforced and deadlier. Two archers shoot faster\u2014enemies beware."
   cost: 100
   archerCount: 2
-  range: 6
+  range: 6.5
   archerTier: {fileID: 11400000, guid: d3c0fc8fab9da91499154a641244e4cf, type: 2}
   arrowTier: {fileID: 11400000, guid: 0da03a6c9d4986b4680034b640684d2c, type: 2}
