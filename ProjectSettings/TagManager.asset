@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 3
+  tags:
+  - Orc
+  - Wolf
+  - Arrow
+  - Slime
+  - Bee
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - Enemy
+  - Water
+  - UI
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Ground
+    uniqueID: 2621235921
+    locked: 0
+  - name: ForeGround
+    uniqueID: 976959051
+    locked: 0
+  - name: Enermies
+    uniqueID: 1448736733
+    locked: 0
+  - name: Hp
+    uniqueID: 2672389385
+    locked: 0
+  - name: CommonUI
+    uniqueID: 4129790201
+    locked: 0
+  - name: Tower
+    uniqueID: 1321628451
+    locked: 0
+  - name: Archer
+    uniqueID: 1069729061
+    locked: 0
+  - name: Arrow
+    uniqueID: 4092407107
+    locked: 0
+  - name: UI
+    uniqueID: 967215281
+    locked: 0
+  - name: Menu
+    uniqueID: 1214931313
+    locked: 0
+  m_RenderingLayers:
+  - Default
