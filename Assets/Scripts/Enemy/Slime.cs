@@ -43,6 +43,7 @@ public class Slime : BaseEnemy
 		if (slimeType == SlimeType.Special)
 		{
 			stopSplit = true;
+			AudioManager.Instance.StopSound(AudioManager.Instance.split);
 			AudioManager.Instance.PlaySound(AudioManager.Instance.slimeDeath);
 			base.Die(); 
 			return;
@@ -74,8 +75,6 @@ public class Slime : BaseEnemy
 				EnemyTracker.Instance.RegisterEnemy();
 				specialSlime.StartSplit(direction, pathIndex);
 			}
-
-			AudioManager.Instance.PlaySound(AudioManager.Instance.slimeDeath);
 			base.Die();
 		}
 		else
@@ -93,6 +92,7 @@ public class Slime : BaseEnemy
 
 		animator.SetFloat("MoveX", moveDirection.x);
 		animator.SetFloat("MoveY", moveDirection.y);
+		AudioManager.Instance.PlaySound(AudioManager.Instance.split);
 		animator.SetTrigger("Split");
 	}
 
@@ -100,6 +100,7 @@ public class Slime : BaseEnemy
 	{
 		if (stopSplit)
 		{
+			AudioManager.Instance.StopSound(AudioManager.Instance.split);
 			return;
 		}
 
