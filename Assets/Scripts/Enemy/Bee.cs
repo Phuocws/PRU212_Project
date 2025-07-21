@@ -1,13 +1,29 @@
+using UnityEngine;
+
 public class Bee : BaseEnemy
 {
+	private AudioSource moveAudioSource;
+
 	protected override void Awake()
 	{
-		maxHealth = 50f; // Set the maximum health for the Bee
-        base.Awake(); // Call the base class Awake method
+		maxHealth = 50f;
+		base.Awake();
+		// No need to create a new AudioSource here
 	}
 
 	protected override void Update()
-    {
-        base.Update(); // Call the base class Update method
+	{
+		base.Update();
+		if (!GameManager.IsGamePaused)
+		{
+			AudioManager.Instance.PlayLoop(AudioManager.Instance.flying);
+		}
+	}
+
+	protected override void Die()
+	{
+		AudioManager.Instance.StopLoop(AudioManager.Instance.flying);
+		AudioManager.Instance.PlaySound(AudioManager.Instance.beeDeath);
+		base.Die();
 	}
 }

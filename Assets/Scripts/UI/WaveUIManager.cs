@@ -99,7 +99,8 @@ public class WaveUIManager : MonoBehaviour
 
                 if (coinsToAdd > 0 && GameManager.Instance != null)
                 {
-                    GameManager.Instance.AddCoins(coinsToAdd);
+                    AudioManager.Instance.PlaySound(AudioManager.Instance.sell);
+					GameManager.Instance.AddCoins(coinsToAdd);
 
                     Vector2 coinUiPos = GameUIManager.Instance.WorldToUIPosition(startWaveButton.transform.position + new Vector3(31.11f, -2.035f, 0));
                     ShowAddCoinPanel(coinsToAdd);
@@ -144,7 +145,7 @@ public class WaveUIManager : MonoBehaviour
         fillImage.fillAmount = 1f;
         startWaveButton.SetActive(true);
         startBattlePanel.SetActive(true);
-    }
+	}
 
     public void StartCountdown(float duration, bool autoStart)
     {
@@ -155,7 +156,8 @@ public class WaveUIManager : MonoBehaviour
 
         fillImage.fillAmount = 0f;
         startWaveButton.SetActive(true);
-    }
+        AudioManager.Instance.PlaySound(AudioManager.Instance.hawk);
+	}
 
     public void ForceStopCountdown()
     {

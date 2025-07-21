@@ -123,6 +123,7 @@ public abstract class BaseEnemy : MonoBehaviour
 
 	public virtual void TakeDamage(float amount)
 	{
+		AudioManager.Instance.PlaySound(AudioManager.Instance.hit);
 		currentHealth = Mathf.Clamp(currentHealth - amount, 0, maxHealth);
 		UpdateHealthBar();
 

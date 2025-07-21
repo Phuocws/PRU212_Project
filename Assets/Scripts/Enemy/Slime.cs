@@ -21,6 +21,15 @@ public class Slime : BaseEnemy
 			GetComponent<EnemyMovement>().enabled = false;
 	}
 
+	protected override void Update()
+	{
+		base.Update();
+		if (!GameManager.IsGamePaused)
+		{
+			AudioManager.Instance.PlayLoop(AudioManager.Instance.slimeMoving);
+		}
+	}
+
 	public override void TakeDamage(float amount)
 	{
 		base.TakeDamage(amount);
@@ -34,12 +43,14 @@ public class Slime : BaseEnemy
 		if (slimeType == SlimeType.Special)
 		{
 			stopSplit = true;
+			AudioManager.Instance.PlaySound(AudioManager.Instance.slimeDeath);
 			base.Die(); 
 			return;
 		}
 
 		if (slimeType == SlimeType.Clone)
 		{
+			AudioManager.Instance.PlaySound(AudioManager.Instance.slimeDeath);
 			base.Die(); 
 			return;
 		}
@@ -64,11 +75,13 @@ public class Slime : BaseEnemy
 				specialSlime.StartSplit(direction, pathIndex);
 			}
 
-			base.Die(); 
+			AudioManager.Instance.PlaySound(AudioManager.Instance.slimeDeath);
+			base.Die();
 		}
 		else
 		{
-			base.Die(); 
+			AudioManager.Instance.PlaySound(AudioManager.Instance.slimeDeath);
+			base.Die();
 		}
 	}
 

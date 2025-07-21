@@ -61,6 +61,7 @@ public class Tower : MonoBehaviour
 
 		if (hit != null && hit.gameObject == gameObject)
 		{
+			AudioManager.Instance.PlaySound(AudioManager.Instance.towerClick);
 			if (IsBuilt)
 			{
 				TowerUIManager.Instance.ShowSelectedTowerPanel(this);
@@ -168,6 +169,7 @@ public class Tower : MonoBehaviour
 			{
 				archer.Initialize(data.archerTier, data.arrowTier, data.range, transform);
 				archerList.Add(archer);
+				AudioManager.Instance.PlayRandomArcherVoice();
 			}
 			else
 			{
@@ -221,6 +223,7 @@ public class Tower : MonoBehaviour
 
 	public void Sell()
 	{
+		AudioManager.Instance.PlaySound(AudioManager.Instance.sell);
 		if (!IsBuilt)
 		{
 			Debug.LogWarning("[Tower] Tried to sell an unbuilt tower.");

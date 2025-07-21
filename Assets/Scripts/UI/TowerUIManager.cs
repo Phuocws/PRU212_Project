@@ -271,49 +271,50 @@ public class TowerUIManager : MonoBehaviour
                 return;
             }
 
-			if (upgradeCoroutine != null)
-			    StopCoroutine(upgradeCoroutine);
-			upgradeCoroutine = StartCoroutine(ShowUpgradeProgress(1f, selectedTower));
+            if (upgradeCoroutine != null)
+                StopCoroutine(upgradeCoroutine);
+            upgradeCoroutine = StartCoroutine(ShowUpgradeProgress(1f, selectedTower));
 
-			selectedTower.Upgrade();
+            selectedTower.Upgrade();
             HideAllTowerPanels();
             return;
         }
 
-		int cost = selectedTower.PreviewLevelData.cost;
+        int cost = selectedTower.PreviewLevelData.cost;
 
-		if (selectedBuildType != "Archer")
-		{
-			selectedBuildType = "Archer";
-			bool enoughCoins = GameManager.Instance.CurrentCoints >= cost;
+        if (selectedBuildType != "Archer")
+        {
+            // Play button click sound only on first click
+            AudioManager.Instance.PlaySound(AudioManager.Instance.TowerButtonCLick);
 
-			buildCheckedIcon.SetActive(enoughCoins);
-			buildUncheckedIcon.SetActive(!enoughCoins);
-			towerIcon.SetActive(false);
+            selectedBuildType = "Archer";
+            bool enoughCoins = GameManager.Instance.CurrentCoints >= cost;
 
-			selectedTower.ShowUpgradeRangeOnly();
-			ShowTowerDetails(
-				selectedTower.PreviewLevelData.displayName,
-				selectedTower.PreviewLevelData.description,
-				selectedTower.PreviewLevelData.arrowTier.minDamage,
+            buildCheckedIcon.SetActive(enoughCoins);
+            buildUncheckedIcon.SetActive(!enoughCoins);
+            towerIcon.SetActive(false);
+
+            selectedTower.ShowUpgradeRangeOnly();
+            ShowTowerDetails(
+                selectedTower.PreviewLevelData.displayName,
+                selectedTower.PreviewLevelData.description,
+                selectedTower.PreviewLevelData.arrowTier.minDamage,
                 selectedTower.PreviewLevelData.arrowTier.maxDamage
-			);
+            );
 
-			return;
-		}
+            return;
+        }
 
-		if (!GameManager.Instance.SpendCoins(cost))
-		{
-			return;
-		}
+        if (!GameManager.Instance.SpendCoins(cost))
+        {
+            return;
+        }
 
+        if (upgradeCoroutine != null)
+            StopCoroutine(upgradeCoroutine);
+        upgradeCoroutine = StartCoroutine(ShowUpgradeProgress(1f, selectedTower));
 
-		// Start upgrade bar
-		if (upgradeCoroutine != null)
-			StopCoroutine(upgradeCoroutine);
-		upgradeCoroutine = StartCoroutine(ShowUpgradeProgress(1f, selectedTower));
-
-		selectedTower.Upgrade();
+        selectedTower.Upgrade();
         firstTowerBuilt = true;
 
         buildTowerPanel.SetActive(false);
@@ -340,7 +341,10 @@ public class TowerUIManager : MonoBehaviour
 
         if (!upgradeConfirmed)
         {
-            upgradeConfirmed = true;
+			// Play button click sound
+			AudioManager.Instance.PlaySound(AudioManager.Instance.TowerButtonCLick);
+
+			upgradeConfirmed = true;
             upgradeCheckedIcon.SetActive(enoughCoins);
             upgradeUncheckedIcon.SetActive(!enoughCoins);
             upgradeIcon.SetActive(false);
@@ -369,10 +373,9 @@ public class TowerUIManager : MonoBehaviour
             return;
         }
 
-		// Start upgrade bar
-		if (upgradeCoroutine != null)
-			StopCoroutine(upgradeCoroutine);
-		upgradeCoroutine = StartCoroutine(ShowUpgradeProgress(1f, selectedTower));
+        if (upgradeCoroutine != null)
+            StopCoroutine(upgradeCoroutine);
+        upgradeCoroutine = StartCoroutine(ShowUpgradeProgress(1f, selectedTower));
 
         selectedTower.Upgrade();
         HideAllTowerPanels();
@@ -390,7 +393,10 @@ public class TowerUIManager : MonoBehaviour
 
         if (!sellConfirmed)
         {
-            sellConfirmed = true;
+			// Play button click sound
+			AudioManager.Instance.PlaySound(AudioManager.Instance.TowerButtonCLick);
+
+			sellConfirmed = true;
             sellCheckedIcon.SetActive(true);
             sellIcon.SetActive(false);
 
@@ -461,7 +467,8 @@ public class TowerUIManager : MonoBehaviour
 
 	private IEnumerator ShowUpgradeProgress(float duration, Tower tower)
 	{
-        isProgressActive = true; // Block clicks
+        AudioManager.Instance.PlaySound(AudioManager.Instance.building);
+		isProgressActive = true; // Block clicks
 
         // Calculate UI position from tower
         Vector2 getPos = GameUIManager.Instance.WorldToUIPosition(tower.transform.position);

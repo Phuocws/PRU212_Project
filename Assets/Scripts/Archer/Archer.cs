@@ -171,8 +171,6 @@ public class Archer : MonoBehaviour
 		isPreparingToShoot = false;
 
 		animController.SetAction(ArcherAction.Attack);
-
-		AudioManager.Instance.PlaySound(AudioManager.Instance.shoot);
 		cooldownTimer = fireRate;
 	}
 
@@ -190,6 +188,7 @@ public class Archer : MonoBehaviour
 	// Called via animation event
 	private void FireArrow()
 	{
+		AudioManager.Instance.PlaySound(AudioManager.Instance.shoot);
 		var targets = GetValidTargets();
 		int arrowCount = archerTierData.arrowsPerShoot;
 		float spread = 40f;

@@ -5,10 +5,19 @@ public class Orc : BaseEnemy
 		maxHealth = 100f;
 		base.Awake();
 	}
-	
+
 	protected override void Update()
 	{
 		base.Update();
-		// Additional Orc-specific update logic can go here
+		if (!GameManager.IsGamePaused)
+		{
+			AudioManager.Instance.PlayLoop(AudioManager.Instance.orcMoving);
+		}
+	}
+
+	protected override void Die()
+	{
+		AudioManager.Instance.PlaySound(AudioManager.Instance.orcDeath);
+		base.Die();
 	}
 }
