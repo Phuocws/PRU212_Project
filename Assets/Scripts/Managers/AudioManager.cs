@@ -9,7 +9,6 @@ public class AudioManager : MonoBehaviour
 	public AudioSource buttonCLick;
 	public AudioSource TowerButtonCLick;
 
-
 	[Header("Archer")]
 	public AudioSource shoot;
 	public AudioSource hit;
@@ -29,6 +28,7 @@ public class AudioManager : MonoBehaviour
 	public AudioSource wolf;
 	public AudioSource orcDeath;
 	public AudioSource oof;
+	public AudioSource split;
 
 	[Header("Enemies Moving")]
 	public AudioSource flying;
@@ -116,7 +116,7 @@ public class AudioManager : MonoBehaviour
 
 		// List all that might be playing during gameplay
 		AudioSource[] toPause = {
-		inGame, onGame, flying, wolfMoving, orcMoving, slimeMoving, wolf, hawk, slimeDeath, beeDeath, wolfDeath, orcDeath, oof, startFirstWave
+		inGame, onGame, flying, wolfMoving, orcMoving, slimeMoving, wolf, hawk, slimeDeath, beeDeath, wolfDeath, orcDeath, oof, startFirstWave, split, defeat, victory,
 	};
 
 		foreach (var audio in toPause)
